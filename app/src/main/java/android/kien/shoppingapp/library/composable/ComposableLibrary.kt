@@ -4,16 +4,29 @@ import android.annotation.SuppressLint
 import android.kien.shoppingapp.Product
 import android.kien.shoppingapp.R
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -23,21 +36,28 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
@@ -47,6 +67,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
@@ -87,8 +108,9 @@ fun ShowLogo(image: Int, w: Int = 200, h: Int = 200){
 // Text input
 @Composable
 fun EmailInput(){
+    var textValue by remember{ mutableStateOf("") }
     OutlinedTextField(
-        value = "",
+        value = textValue,
         label = {
             Text(
                 text = "Email"
@@ -99,12 +121,13 @@ fun EmailInput(){
                 text = "Enter your email"
             )
         },
-        onValueChange = {},
+        onValueChange = { textValue = it },
         singleLine = true,
     )
 }
 @Composable
 fun PasswordInput(){
+    var textValue by remember{ mutableStateOf("") }
     OutlinedTextField(
         value = "",
         label = {
@@ -117,8 +140,9 @@ fun PasswordInput(){
                 text = "Enter your password"
             )
         },
-        onValueChange = {},
+        onValueChange = {textValue = it},
         singleLine = true,
+        visualTransformation = PasswordVisualTransformation()
     )
 }
 @Composable
@@ -166,15 +190,17 @@ fun SignUpInput(){
     }
 }
 
+
 // Check box
 @Composable
-fun RememberPassword(remember: Boolean = false){
+fun RememberPassword(){
+    val rememberState = remember { mutableStateOf(false) }
     Row(
         verticalAlignment = Alignment.CenterVertically
     ){
         Checkbox(
-            checked = remember,
-            onCheckedChange = {},
+            checked = rememberState.value,
+            onCheckedChange = {rememberState.value = it},
         )
         Text(
             text = "Remember me"
@@ -191,7 +217,7 @@ fun SignInButton(){
         colors = ButtonDefaults.buttonColors(containerColor = Color(217, 217, 217))
     ) {
         Text(
-            text = "Sign Up",
+            text = "Sign In",
             fontFamily = rignteousFont,
             fontWeight = FontWeight.Normal,
             color = Color.Black
@@ -199,9 +225,9 @@ fun SignInButton(){
     }
 }
 @Composable
-fun SignUpTextButton(){
+fun SignUpTextButton(onNavigateToSignUp: () -> Unit){
     TextButton(
-        onClick = { /*TODO*/ }
+        onClick = onNavigateToSignUp
     ) {
         Text(
             text = "I don't have account yet!",
@@ -229,7 +255,7 @@ fun SignUpButton(){
 }
 // SignInScreen
 @Composable
-fun SignInScreen(){
+fun SignInScreen(onNavigateToSignUp: () -> Unit){
     Column (
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -245,7 +271,7 @@ fun SignInScreen(){
         }
         Spacer(modifier = Modifier.padding(top = 20.dp))
         SignInButton()
-        SignUpTextButton()
+        SignUpTextButton(onNavigateToSignUp)
     }
 }
 // SignUpScreen
@@ -299,28 +325,23 @@ fun ProductCard(productName: String, productPrice: Double, productImage: Int){
                 )
             }
             Text(
-                text = "\$${productPrice}"
+                text = "\$${productPrice}",
             )
 
         }
     }
 }
 
-
-
 val productList = mutableListOf(
-    Product("", 5.5, R.drawable.ic_launcher_background),
-    Product("", 5.5, R.drawable.ic_launcher_background),
-    Product("", 5.5, R.drawable.ic_launcher_background),
-    Product("", 5.5, R.drawable.ic_launcher_background),
-    Product("", 5.5, R.drawable.ic_launcher_background),
-    Product("", 5.5, R.drawable.ic_launcher_background),
-    Product("", 5.5, R.drawable.ic_launcher_background),
-    Product("", 5.5, R.drawable.ic_launcher_background),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
 )
-
-
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -379,6 +400,124 @@ fun MyTopBar(drawerState: DrawerState, scope: CoroutineScope){
         }
     )
 }
+
+@Composable
+fun AccountDrawerSheet(accountName: String, sex: Boolean, avatarImage: Int){
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .width(310.dp)
+            .height(60.dp)
+            .background(color = Color(214, 214, 214)),
+    ){
+        Row {
+            Image(
+                painter = painterResource(id = avatarImage),
+                contentDescription = null,
+                contentScale = ContentScale.FillHeight,
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(CircleShape)
+                    .border(0.1.dp, color = Color.Transparent),
+            )
+            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+            Column {
+                Text(
+                    text = accountName,
+                    fontFamily = rignteousFont,
+                    fontSize = 18.sp,
+                )
+
+                Text(
+                    text = if(!sex) "Male" else "Female",
+                    fontFamily = rignteousFont,
+                    fontSize = 15.sp,
+                )
+            }
+
+        }
+        Column (
+            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier.fillMaxHeight()
+        ) {
+            TextButton(onClick = { }, contentPadding = PaddingValues()) {
+                Text(
+                    text = "Account setting",
+                    fontFamily = rignteousFont,
+                    color = Color.Blue,
+                    fontSize = 15.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ListProductScreen(){
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    ModalNavigationDrawer(
+        modifier = Modifier.fillMaxWidth(),
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet (
+                content = {
+                    Row (horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth(0.85f)){
+                        IconButton(onClick = { }) {
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Arrow Back Button")
+                        }
+                    }
+                    AccountDrawerSheet("Flores, Juanita", false, R.drawable.avatar)
+                    Spacer(modifier = Modifier.padding(horizontal = 100.dp))
+                    Column (
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth(0.86f)
+                    ){
+                        IconButton(
+                            onClick = { },
+                            modifier = Modifier.size(60.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = "Exit app",
+                                modifier = Modifier.size(60.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.padding(30.dp))
+                    }
+
+                }
+            )
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                MyTopBar(drawerState = drawerState, scope = scope)
+            },
+            content = {
+                    innerPadding ->
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier.padding(innerPadding)
+                ) {
+                    items(productList) {
+                            item ->
+                        ProductCard(
+                            productName = item.productName,
+                            productPrice = item.productPrice,
+                            productImage = item.productImage
+                        )
+                    }
+                }
+            }
+        )
+    }
+}
+
+
 
 
 
