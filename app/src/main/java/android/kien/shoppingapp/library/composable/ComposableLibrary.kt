@@ -233,14 +233,13 @@ fun ProductCard(productName: String, productPrice: Double, productImage: Int) {
 }
 
 val productList = mutableListOf(
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
+    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
 )
 
 @Composable
