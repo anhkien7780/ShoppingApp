@@ -63,9 +63,6 @@ fun ChangeInfoScreen(userInfo: UserInfo, onUserInfoChange: (UserInfo) -> Unit) {
     var name by remember {
         mutableStateOf(userInfo.name)
     }
-    var phoneNumber by remember {
-        mutableStateOf(userInfo.phoneNumber)
-    }
     var gender by remember {
         mutableStateOf(userInfo.gender)
     }
@@ -99,13 +96,6 @@ fun ChangeInfoScreen(userInfo: UserInfo, onUserInfoChange: (UserInfo) -> Unit) {
                 label = "Change name",
                 placeholder = name
             )
-            Spacer(modifier = Modifier.padding(10.dp))
-            MyOutlinedTextFiled(
-                value = phoneNumber,
-                onValuedChange = { phoneNumber = it },
-                label = "Phone number",
-                placeholder = phoneNumber
-            )
 
             Spacer(modifier = Modifier.padding(10.dp))
             GenderSelection(gender = gender) { gender = it }
@@ -125,7 +115,6 @@ fun ChangeInfoScreen(userInfo: UserInfo, onUserInfoChange: (UserInfo) -> Unit) {
                         onUserInfoChange(
                             UserInfo(
                                 name = name,
-                                phoneNumber = phoneNumber,
                                 gender = gender,
                                 birthday = birthday
                             )
