@@ -6,9 +6,12 @@ import android.kien.shoppingapp.data.Date
 import android.kien.shoppingapp.data.UserInfo
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.ui.theme.ShoppingAppTheme
+import android.net.Uri
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -45,15 +49,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import java.time.LocalDateTime
 import java.util.Calendar
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,7 +124,11 @@ fun ChangeInfoScreen(userInfo: UserInfo, onUserInfoChange: (UserInfo) -> Unit) {
                             UserInfo(
                                 name = name,
                                 gender = gender,
-                                birthday = birthday
+                                birthday = birthday,
+                                phoneNumber = userInfo.phoneNumber,
+                                address = userInfo.address,
+                                avatarImage = userInfo.avatarImage,
+                                id = userInfo.id
                             )
                         )
                     },
@@ -136,6 +148,14 @@ fun ChangeInfoScreen(userInfo: UserInfo, onUserInfoChange: (UserInfo) -> Unit) {
 
 @Composable
 fun ChangeAvatar(avatarImage: Int) {
+    var uri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+    val pickMedia = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+    ) {
+        uri = it
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -143,18 +163,27 @@ fun ChangeAvatar(avatarImage: Int) {
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Image(
-            painter = painterResource(id = avatarImage),
+        AsyncImage(
+            model = uri,
             contentDescription = "Avatar",
-            modifier = Modifier.size(90.dp)
+            contentScale = ContentScale.Crop,
+            placeholder = painterResource(id = avatarImage),
+            modifier = Modifier
+                .size(90.dp)
+                .clip(CircleShape)
         )
+
         Spacer(modifier = Modifier.padding(30.dp))
         Column(
             modifier = Modifier.fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            IconButton(onClick = { /*TODO*/ }, modifier = Modifier.padding(PaddingValues())) {
+            IconButton(onClick = {
+                pickMedia.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            }, modifier = Modifier.padding(PaddingValues())) {
                 Icon(
                     painter = painterResource(id = R.drawable.folder_send_fill_2x),
                     contentDescription = "Folder send fill"
@@ -359,7 +388,27 @@ fun BirthdaySelection(birthday: Date, onBirthDayChange: (Date) -> Unit) {
 @Composable
 fun BirthdaySelectionPreview() {
     ShoppingAppTheme {
-        BirthdaySelection(UserInfo().birthday) { UserInfo().birthday = it }
+        BirthdaySelection(
+            UserInfo(
+                avatarImage = R.drawable.avatar,
+                name = "Flores, Juanita",
+                gender = "Male",
+                birthday = Date(1, 1, 2000),
+                phoneNumber = "0987654321",
+                address = "123 Main St",
+                id = 0
+            ).birthday
+        ) {
+            UserInfo(
+                avatarImage = R.drawable.avatar,
+                name = "Flores, Juanita",
+                gender = "Male",
+                birthday = Date(1, 1, 2000),
+                phoneNumber = "0987654321",
+                address = "123 Main St",
+                id = 0
+            ).birthday = it
+        }
     }
 }
 
@@ -368,14 +417,34 @@ fun BirthdaySelectionPreview() {
 @Composable
 fun ChangeInfoScreenPreview() {
     ShoppingAppTheme {
-        ChangeInfoScreen(UserInfo()) {}
+        ChangeInfoScreen(
+            UserInfo(
+                avatarImage = R.drawable.avatar,
+                name = "Flores, Juanita",
+                gender = "Male",
+                birthday = Date(1, 1, 2000),
+                phoneNumber = "0987654321",
+                address = "123 Main St",
+                id = 0
+            )
+        ) {}
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ChangeAvatarPreview() {
-    ChangeAvatar(avatarImage = UserInfo().avatarImage)
+    ChangeAvatar(
+        avatarImage = UserInfo(
+            avatarImage = R.drawable.avatar,
+            name = "Flores, Juanita",
+            gender = "Male",
+            birthday = Date(1, 1, 2000),
+            phoneNumber = "0987654321",
+            address = "123 Main St",
+            id = 0
+        ).avatarImage
+    )
 }
 
 @Preview(showBackground = true)

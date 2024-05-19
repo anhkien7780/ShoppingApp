@@ -1,8 +1,8 @@
 package android.kien.shoppingapp.screen
 
 import android.annotation.SuppressLint
-import android.kien.shoppingapp.Product
-import android.kien.shoppingapp.library.composable.productList
+import android.kien.shoppingapp.data.Product
+import android.kien.shoppingapp.data.allProducts
 import android.kien.shoppingapp.library.composable.robotoMonoFont
 import android.kien.shoppingapp.ui.theme.ShoppingAppTheme
 import androidx.compose.foundation.Image
@@ -108,14 +108,14 @@ fun ProductDetailsScreen(product: Product) {
                     .padding(vertical = 20.dp)
             ) {
                 Image(
-                    painter = painterResource(id = product.productImage),
+                    painter = painterResource(id = product.images[0]),
                     contentDescription = "Product Image",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.FillHeight
                 )
             }
             Text(
-                text = product.productName,
+                text = product.name,
                 modifier = Modifier
                     .align(Alignment.Start)
                     .padding(bottom = 20.dp),
@@ -124,7 +124,7 @@ fun ProductDetailsScreen(product: Product) {
                 )
             )
             Text(
-                text = "\$" + product.productPrice.toString(),
+                text = "\$" + product.price.toString(),
                 modifier = Modifier.align(Alignment.Start),
                 style = TextStyle(
                     fontWeight = FontWeight.ExtraBold, fontFamily = robotoMonoFont, fontSize = 20.sp
@@ -141,7 +141,7 @@ fun ProductDetailsScreen(product: Product) {
                 )
             )
             Text(
-                text = product.productDescription,
+                text = product.description,
                 modifier = Modifier.align(Alignment.Start),
                 style = TextStyle(
                     fontWeight = FontWeight.Normal, fontFamily = robotoMonoFont, fontSize = 18.sp
@@ -170,11 +170,13 @@ fun ProductDetailsScreen(product: Product) {
     }
 }
 
+
+
 @Preview(showBackground = true)
 @Composable
 fun ProductDetailsScreenPreview() {
     ShoppingAppTheme {
-        ProductDetailsScreen(productList[0])
+        ProductDetailsScreen(allProducts[0])
     }
 }
 

@@ -1,6 +1,8 @@
 package android.kien.shoppingapp.screen
 
 import android.annotation.SuppressLint
+import android.kien.shoppingapp.R
+import android.kien.shoppingapp.data.Date
 import android.kien.shoppingapp.data.UserInfo
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.ui.theme.ShoppingAppTheme
@@ -109,14 +111,30 @@ fun MyButton(buttonText: String){
 @Composable
 fun AccountSettingScreenPreView(){
     ShoppingAppTheme {
-        UserSettingScreen(UserInfo())
+        UserSettingScreen(UserInfo(
+            avatarImage = R.drawable.avatar,
+            name = "Flores, Juanita",
+            gender = "Male",
+            birthday = Date(1, 1, 2000),
+            phoneNumber = "0987654321",
+            address = "123 Main St",
+            id = 0
+        ))
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun UserInfoPreview(){
-    UserInfoComponent(userInfo = UserInfo())
+    UserInfoComponent(userInfo = UserInfo(
+        avatarImage = R.drawable.avatar,
+        name = "Flores, Juanita",
+        gender = "Male",
+        birthday = Date(1, 1, 2000),
+        phoneNumber = "0987654321",
+        address = "123 Main St",
+        id = 0
+    ))
 }
 
 @Preview(showBackground = true)

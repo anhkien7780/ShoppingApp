@@ -1,6 +1,5 @@
 package android.kien.shoppingapp.library.composable
 
-import android.kien.shoppingapp.Product
 import android.kien.shoppingapp.R
 import android.kien.shoppingapp.ui.theme.ShoppingAppTheme
 import androidx.compose.foundation.Image
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -36,7 +33,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -50,30 +46,7 @@ val robotoMonoFont = FontFamily(
     Font(R.font.roboto_mono_variable_font_weight, FontWeight.Normal)
 )
 
-// Image
-@Composable
-fun ShowLogo(
-    logoImage: Int,
-    modifier: Modifier = Modifier,
-    logoSize: Dp = 200.dp
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(id = logoImage),
-            contentDescription = "Logo",
-            modifier = modifier.size(logoSize)
-        )
-        Spacer(modifier = Modifier.size(30.dp))
-        Text(
-            text = "Shopping App",
-            fontSize = 30.sp,
-            fontFamily = rignteousFont,
-            fontWeight = FontWeight.Normal
-        )
-    }
-}
+
 
 @Composable
 fun CustomTextField(
@@ -196,51 +169,9 @@ fun SignUpTextButton(onNavigateToSignUp: () -> Unit) {
 }
 
 
-@Composable
-fun ProductCard(productName: String, productPrice: Double, productImage: Int) {
-    val cardWidth = 180.dp
-    val cardHeight = 330.dp
-    Card(
-        shape = RectangleShape,
-        modifier = Modifier
-            .padding(5.dp)
-            .size(width = cardWidth, height = cardHeight)
 
-    ) {
-        Column {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
 
-                ) {
-                Image(
-                    modifier = Modifier.size(width = cardWidth, height = 250.dp),
-                    painter = painterResource(id = productImage),
-                    contentDescription = "Product Image",
-                    contentScale = ContentScale.FillHeight
-                )
-            }
-            Card {
-                Text(
-                    text = productName
-                )
-            }
-            Text(
-                text = "\$${productPrice}",
-            )
 
-        }
-    }
-}
-
-val productList = mutableListOf(
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
-    Product("Cafe meo meo meo meo meo", 5.5, R.drawable.ic_launcher_background, "Made from high quality mulberries. Mulberries contain iron, vitamin C, and compounds."),
-)
 
 @Composable
 fun AccountDrawerSheet(
@@ -299,13 +230,7 @@ fun AccountDrawerSheet(
 
 
 // Preview
-@Preview(showBackground = true)
-@Composable
-fun ShowLogoPreview() {
-    ShoppingAppTheme {
-        ShowLogo(logoImage = R.drawable.ic_launcher_background)
-    }
-}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -331,11 +256,7 @@ fun SignUpTextButtonPreview() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ProductCardPreview() {
-    ProductCard("Cafe meo meo meo", 54.0, R.drawable.ic_launcher_background)
-}
+
 
 @Preview(showBackground = true)
 @Composable

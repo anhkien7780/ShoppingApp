@@ -1,13 +1,15 @@
 package android.kien.shoppingapp.screen
 
 import android.kien.shoppingapp.R
+import android.kien.shoppingapp.data.Product
+import android.kien.shoppingapp.data.allProducts
 import android.kien.shoppingapp.library.composable.AccountDrawerSheet
-import android.kien.shoppingapp.library.composable.ProductCard
-import android.kien.shoppingapp.library.composable.productList
 import android.kien.shoppingapp.library.composable.robotoMonoFont
 import android.kien.shoppingapp.ui.theme.ShoppingAppTheme
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,12 +17,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,7 +44,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -149,11 +154,9 @@ fun ListProductScreen(onLogout: () -> Unit) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2), modifier = Modifier.padding(innerPadding)
             ) {
-                items(productList) { item ->
+                items(allProducts.size) { item ->
                     ProductCard(
-                        productName = item.productName,
-                        productPrice = item.productPrice,
-                        productImage = item.productImage
+                        allProducts[item]
                     )
                 }
             }
@@ -161,11 +164,51 @@ fun ListProductScreen(onLogout: () -> Unit) {
     }
 }
 
+@Composable
+fun ProductCard(product: Product) {
+    val cardWidth = 180.dp
+    val cardHeight = 330.dp
+    Card(
+        shape = RectangleShape,
+        modifier = Modifier
+            .padding(5.dp)
+            .size(width = cardWidth, height = cardHeight)
 
+    ) {
+        Column {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+
+                ) {
+                Image(
+                    modifier = Modifier.size(width = cardWidth, height = 250.dp),
+                    painter = painterResource(id = product.images[0]),
+                    contentDescription = "Product Image",
+                    contentScale = ContentScale.FillHeight
+                )
+            }
+            Card {
+                Text(
+                    text = product.name
+                )
+            }
+            Text(
+                text = "$" + product.price.toString(),
+            )
+
+        }
+    }
+}
 @Preview(showBackground = true)
 @Composable
 fun ListProductScreenPreview() {
     ShoppingAppTheme {
         ListProductScreen {}
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProductCardPreview() {
+    ProductCard(allProducts[0])
 }

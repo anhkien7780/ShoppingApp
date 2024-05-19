@@ -3,7 +3,6 @@
 import android.annotation.SuppressLint
 import android.kien.shoppingapp.R
 import android.kien.shoppingapp.data.allAccounts
-import android.kien.shoppingapp.library.composable.ShowLogo
 import android.kien.shoppingapp.library.composable.SignUpTextButton
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.library.composable.robotoMonoFont
@@ -41,21 +40,19 @@ import androidx.compose.ui.unit.dp
 fun SignInScreen(
      onNavigateToSignUp: () -> Unit,
      onSuccessfulSignIn: () -> Unit,
-     @SuppressLint("ModifierParameter")
-     modifier: Modifier = Modifier.fillMaxSize()
     ){
     var email by remember{mutableStateOf("")}
     var password by remember {mutableStateOf("")}
     var rememberState by remember { mutableStateOf(false) }
     var signUpSuccessful by remember { mutableStateOf(true) }
     Column (
-        modifier = modifier,
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ){
         Column(horizontalAlignment = Alignment.Start){
             Column (horizontalAlignment = Alignment.CenterHorizontally){
-                ShowLogo(logoImage = R.drawable.ic_launcher_background)
+                ShowLogo(logoImage = R.drawable.logo)
                 Spacer(modifier = Modifier.height(50.dp))
                 OutlinedTextField(
                     value = email,
