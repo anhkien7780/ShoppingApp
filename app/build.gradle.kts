@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
 }
 
 android {
@@ -50,9 +51,20 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.activity.compose.v180)
+    implementation(libs.material3)
+    implementation(libs.ui)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.androidx.core.ktx.v1120)
+    implementation(libs.androidx.lifecycle.runtime.ktx.v262)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.retrofit)
+    implementation(libs.coil.compose.v240)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.lifecycle.viewmodel.compose)
     implementation(libs.coil.compose)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.gson)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

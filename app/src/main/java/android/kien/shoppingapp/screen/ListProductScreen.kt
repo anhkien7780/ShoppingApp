@@ -1,18 +1,18 @@
 package android.kien.shoppingapp.screen
 
 import android.kien.shoppingapp.R
-import android.kien.shoppingapp.data.Product
-import android.kien.shoppingapp.data.allProducts
 import android.kien.shoppingapp.library.composable.AccountDrawerSheet
 import android.kien.shoppingapp.library.composable.robotoMonoFont
-import android.kien.shoppingapp.ui.theme.ShoppingAppTheme
+import android.kien.shoppingapp.navigation.Screen
+import android.kien.shoppingapp.viewmodel.ProductViewModel
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -50,16 +50,26 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import com.example.models.Product
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListProductScreen(onLogout: () -> Unit) {
+fun ListProductScreen(
+    navController: NavController,
+    productViewModel: ProductViewModel,
+    onNavigateToCart: () -> Unit,
+    onLogout: () -> Unit,
+    onClick: () -> Unit
+) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var backPressedCount by remember { mutableIntStateOf(0) }
@@ -76,11 +86,13 @@ fun ListProductScreen(onLogout: () -> Unit) {
         ModalDrawerSheet(content = {
             Spacer(modifier = Modifier.size(20.dp))
             AccountDrawerSheet(
-                "Flores, Juanita", false, R.drawable.avatar, modifier = Modifier
+                "Flores, Juanita", false, R.drawable.avatar, modifier = Modifier, onClick = onClick
             )
-            Row(modifier = Modifier
+            Row(
+                modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .fillMaxHeight(0.95f)) {
+                    .fillMaxHeight(0.95f)
+            ) {
 
                 IconButton(
                     onClick = onLogout,
@@ -144,7 +156,7 @@ fun ListProductScreen(onLogout: () -> Unit) {
 
                 }
             }, actions = {
-                IconButton(onClick = { }) {
+                IconButton(onClick = { onNavigateToCart() }) {
                     Icon(
                         imageVector = Icons.Default.ShoppingCart, contentDescription = null
                     )
@@ -154,10 +166,12 @@ fun ListProductScreen(onLogout: () -> Unit) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2), modifier = Modifier.padding(innerPadding)
             ) {
-                items(allProducts.size) { item ->
+                items(productViewModel.productList.value!!.size) { item ->
                     ProductCard(
-                        allProducts[item]
-                    )
+                        product = productViewModel.productList.value!![item]
+                    ) {
+                        navController.navigate(Screen.ProductDetailScreen.route + "/$item")
+                    }
                 }
             }
         })
@@ -165,7 +179,7 @@ fun ListProductScreen(onLogout: () -> Unit) {
 }
 
 @Composable
-fun ProductCard(product: Product) {
+fun ProductCard(product: Product, onClick: () -> Unit) {
     val cardWidth = 180.dp
     val cardHeight = 330.dp
     Card(
@@ -173,6 +187,9 @@ fun ProductCard(product: Product) {
         modifier = Modifier
             .padding(5.dp)
             .size(width = cardWidth, height = cardHeight)
+            .clickable {
+                onClick()
+            }
 
     ) {
         Column {
@@ -180,16 +197,20 @@ fun ProductCard(product: Product) {
                 horizontalAlignment = Alignment.CenterHorizontally,
 
                 ) {
-                Image(
+                AsyncImage(
+                    model = product.imgSrc,
                     modifier = Modifier.size(width = cardWidth, height = 250.dp),
-                    painter = painterResource(id = product.images[0]),
+                    placeholder = painterResource(id = R.drawable.loading_img),
                     contentDescription = "Product Image",
                     contentScale = ContentScale.FillHeight
                 )
             }
             Card {
                 Text(
-                    text = product.name
+                    text = product.productName,
+                    Modifier.fillMaxWidth(),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             Text(
@@ -199,16 +220,17 @@ fun ProductCard(product: Product) {
         }
     }
 }
-@Preview(showBackground = true)
-@Composable
-fun ListProductScreenPreview() {
-    ShoppingAppTheme {
-        ListProductScreen {}
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
 fun ProductCardPreview() {
-    ProductCard(allProducts[0])
+    ProductCard(
+        Product(
+            1,
+            "Product 1",
+            12f,
+            "https://picsum.photos/200/300",
+            ""
+        )
+    ) {}
 }

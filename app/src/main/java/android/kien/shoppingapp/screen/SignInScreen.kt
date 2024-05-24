@@ -1,12 +1,13 @@
- package android.kien.shoppingapp.screen
+package android.kien.shoppingapp.screen
 
 import android.annotation.SuppressLint
 import android.kien.shoppingapp.R
-import android.kien.shoppingapp.data.allAccounts
 import android.kien.shoppingapp.library.composable.SignUpTextButton
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.library.composable.robotoMonoFont
-import android.kien.shoppingapp.ui.theme.ShoppingAppTheme
+import android.kien.shoppingapp.viewmodel.AccountViewModel
+import android.kien.shoppingapp.viewmodel.CartViewModel
+import android.kien.shoppingapp.viewmodel.LoginUiState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,31 +34,33 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
- @SuppressLint("UnrememberedMutableState")
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun SignInScreen(
-     onNavigateToSignUp: () -> Unit,
-     onSuccessfulSignIn: () -> Unit,
-    ){
-    var email by remember{mutableStateOf("")}
-    var password by remember {mutableStateOf("")}
+    cartViewModel: CartViewModel,
+    accountViewModel: AccountViewModel,
+    onNavigateToSignUp: () -> Unit,
+    onSuccessfulSignIn: () -> Unit,
+    loginUiState: LoginUiState
+) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var rememberState by remember { mutableStateOf(false) }
-    var signUpSuccessful by remember { mutableStateOf(true) }
-    Column (
+    var wrongPassword by remember { mutableStateOf(false) }
+    Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
-    ){
-        Column(horizontalAlignment = Alignment.Start){
-            Column (horizontalAlignment = Alignment.CenterHorizontally){
+    ) {
+        Column(horizontalAlignment = Alignment.Start) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 ShowLogo(logoImage = R.drawable.logo)
                 Spacer(modifier = Modifier.height(50.dp))
                 OutlinedTextField(
                     value = email,
-                    onValueChange = {email = it},
+                    onValueChange = { email = it },
                     label = { Text(text = "Email") },
                     placeholder = { Text(text = "Email") },
                     singleLine = true,
@@ -64,7 +68,7 @@ fun SignInScreen(
                 )
                 OutlinedTextField(
                     value = password,
-                    onValueChange = {password = it},
+                    onValueChange = { password = it },
                     label = { Text(text = "Password") },
                     placeholder = { Text(text = "Password") },
                     singleLine = true,
@@ -74,10 +78,10 @@ fun SignInScreen(
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 Checkbox(
                     checked = rememberState,
-                    onCheckedChange = {rememberState = it},
+                    onCheckedChange = { rememberState = it },
                 )
                 Text(
                     text = "Remember me"
@@ -87,13 +91,8 @@ fun SignInScreen(
         Spacer(modifier = Modifier.padding(top = 20.dp))
         Button(
             onClick = {
-                for(account in allAccounts)
-                    signUpSuccessful = (account.email == email) && (account.password == password)
-                if(signUpSuccessful) {
-                        onSuccessfulSignIn()
-                } else{
-                    signUpSuccessful = false
-                }
+                accountViewModel.login(email, password)
+                wrongPassword = false
             },
             modifier = Modifier.size(width = 150.dp, height = 50.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(217, 217, 217))
@@ -105,13 +104,19 @@ fun SignInScreen(
                 color = Color.Black
             )
         }
+        when (loginUiState) {
+            is LoginUiState.Idle -> {}
+            is LoginUiState.Loading -> {CircularProgressIndicator()}
+            is LoginUiState.Success -> {
+                onSuccessfulSignIn()
+                cartViewModel.getCart(accountViewModel.username)
+            }
+            is LoginUiState.Error -> {wrongPassword = true}
+        }
         SignUpTextButton(onNavigateToSignUp)
         Text(
-            text =
-            if(signUpSuccessful)
-                ""
-             else
-                "Sorry, your password is incorrect or your account isn’t exits",
+            text = if (wrongPassword) "Sorry, your password is incorrect or your account isn’t exits"
+            else "",
             textAlign = TextAlign.Center,
             color = Color.Red,
             fontFamily = robotoMonoFont,
@@ -121,10 +126,5 @@ fun SignInScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SignInScreenPreview(){
-    ShoppingAppTheme {
-        SignInScreen({},{})
-    }
-}
+
+

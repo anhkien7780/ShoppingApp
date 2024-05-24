@@ -21,12 +21,12 @@ import androidx.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun AddressesScreen() {
+fun AddressesScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(title = { Text(text = "ADDRESSES", fontFamily = rignteousFont) },
                 navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { onBack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back Button"
@@ -62,6 +62,6 @@ fun AddressItemPreview() {
 @Composable
 fun AddressesScreenPreview() {
     ShoppingAppTheme {
-        AddressesScreen()
+        AddressesScreen({})
     }
 }

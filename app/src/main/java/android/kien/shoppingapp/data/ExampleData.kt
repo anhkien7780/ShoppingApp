@@ -18,7 +18,17 @@ data class UserInfo(
     var birthday: Date
 )
 
-val allUserInfo = mutableListOf<UserInfo>()
+val allUserInfo = mutableListOf<UserInfo>(
+    UserInfo(
+        avatarImage = R.drawable.avatar,
+        name = "Flores, Juanita",
+        gender = "Male",
+        birthday = Date(1, 1, 2000),
+        phoneNumber = "0987654321",
+        address = "123 Main St",
+        id = 0
+    )
+)
 
 data class Product(
     val id: Int,

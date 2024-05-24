@@ -2,9 +2,10 @@ package android.kien.shoppingapp.screen
 
 import android.annotation.SuppressLint
 import android.kien.shoppingapp.R
-import android.kien.shoppingapp.data.Date
 import android.kien.shoppingapp.data.UserInfo
 import android.kien.shoppingapp.library.composable.rignteousFont
+import android.kien.shoppingapp.models.Date
+import android.kien.shoppingapp.models.User
 import android.kien.shoppingapp.ui.theme.ShoppingAppTheme
 import android.net.Uri
 import android.os.Build
@@ -67,15 +68,15 @@ import java.util.Calendar
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ChangeInfoScreen(userInfo: UserInfo, onUserInfoChange: (UserInfo) -> Unit) {
+fun ChangeInfoScreen(userInfo: User, onSave: () -> Unit, onBack: () -> Unit) {
     var name by remember {
         mutableStateOf(userInfo.name)
     }
     var gender by remember {
-        mutableStateOf(userInfo.gender)
+        mutableStateOf(userInfo.sex)
     }
     var birthday by remember {
-        mutableStateOf(userInfo.birthday)
+        mutableStateOf(userInfo.getBirthDay())
     }
 
     Scaffold(topBar = {
@@ -85,31 +86,39 @@ fun ChangeInfoScreen(userInfo: UserInfo, onUserInfoChange: (UserInfo) -> Unit) {
                 fontFamily = rignteousFont
             )
         }, navigationIcon = {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back Button"
-            )
+            Button(onClick = { onBack()}) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back Button"
+                )
+
+            }
         })
     }) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding)
         ) {
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
-            ChangeAvatar(avatarImage = userInfo.avatarImage)
+            ChangeAvatar(placeholder = R.drawable.default_logo)
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
             Spacer(modifier = Modifier.padding(10.dp))
             MyOutlinedTextFiled(
                 value = name,
                 onValuedChange = { name = it },
                 label = "Change name",
-                placeholder = name
+                placeholder = name,
+
             )
 
             Spacer(modifier = Modifier.padding(10.dp))
-            GenderSelection(gender = gender) { gender = it }
+            GenderSelection(sex = if(userInfo.sex) "Male" else "Female"  ) { gender = it == "Male" }
             Spacer(modifier = Modifier.padding(10.dp))
-            BirthdaySelection(birthday = birthday) {
-                birthday = it
+            BirthdaySelection(birthday = Date(
+                birthday.dayOfMonth,
+                birthday.monthValue,
+                birthday.year
+            )) {
+                birthday = it.toLocalDate()
             }
 
             Row(
@@ -120,17 +129,7 @@ fun ChangeInfoScreen(userInfo: UserInfo, onUserInfoChange: (UserInfo) -> Unit) {
             ) {
                 Button(
                     onClick = {
-                        onUserInfoChange(
-                            UserInfo(
-                                name = name,
-                                gender = gender,
-                                birthday = birthday,
-                                phoneNumber = userInfo.phoneNumber,
-                                address = userInfo.address,
-                                avatarImage = userInfo.avatarImage,
-                                id = userInfo.id
-                            )
-                        )
+                              onSave()
                     },
                     modifier = Modifier
                         .align(Alignment.Bottom)
@@ -147,7 +146,7 @@ fun ChangeInfoScreen(userInfo: UserInfo, onUserInfoChange: (UserInfo) -> Unit) {
 }
 
 @Composable
-fun ChangeAvatar(avatarImage: Int) {
+fun ChangeAvatar(placeholder: Int) {
     var uri by remember {
         mutableStateOf<Uri?>(null)
     }
@@ -167,7 +166,7 @@ fun ChangeAvatar(avatarImage: Int) {
             model = uri,
             contentDescription = "Avatar",
             contentScale = ContentScale.Crop,
-            placeholder = painterResource(id = avatarImage),
+            placeholder = painterResource(id = placeholder),
             modifier = Modifier
                 .size(90.dp)
                 .clip(CircleShape)
@@ -218,6 +217,7 @@ fun MyOutlinedTextFiled(
             fontFamily = rignteousFont, fontSize = 20.sp
         ),
         shape = RectangleShape,
+        maxLines = 1,
         modifier = Modifier.fillMaxWidth(),
     )
 }
@@ -269,7 +269,7 @@ fun DropDownSelection(
 
 @Composable
 fun GenderSelection(
-    gender: String, onGenderChange: (String) -> Unit
+    sex: String, onGenderChange: (String) -> Unit
 ) {
     var maleGenderChecked by remember {
         mutableStateOf(false)
@@ -277,9 +277,7 @@ fun GenderSelection(
     var femaleGenderChecked by remember {
         mutableStateOf(false)
     }
-    var otherGenderChecked by remember {
-        mutableStateOf(false)
-    }
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Gender",
@@ -294,20 +292,13 @@ fun GenderSelection(
                 maleGenderChecked = it
                 onGenderChange("Male")
                 femaleGenderChecked = false
-                otherGenderChecked = false
             }
             MyCheckBox(text = "Female", checked = femaleGenderChecked) {
                 femaleGenderChecked = it
                 onGenderChange("Female")
                 maleGenderChecked = false
-                otherGenderChecked = false
             }
-            MyCheckBox(text = "Other", checked = otherGenderChecked) {
-                otherGenderChecked = it
-                onGenderChange("Other")
-                maleGenderChecked = false
-                femaleGenderChecked = false
-            }
+
         }
     }
 }
@@ -383,69 +374,10 @@ fun BirthdaySelection(birthday: Date, onBirthDayChange: (Date) -> Unit) {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
-@Composable
-fun BirthdaySelectionPreview() {
-    ShoppingAppTheme {
-        BirthdaySelection(
-            UserInfo(
-                avatarImage = R.drawable.avatar,
-                name = "Flores, Juanita",
-                gender = "Male",
-                birthday = Date(1, 1, 2000),
-                phoneNumber = "0987654321",
-                address = "123 Main St",
-                id = 0
-            ).birthday
-        ) {
-            UserInfo(
-                avatarImage = R.drawable.avatar,
-                name = "Flores, Juanita",
-                gender = "Male",
-                birthday = Date(1, 1, 2000),
-                phoneNumber = "0987654321",
-                address = "123 Main St",
-                id = 0
-            ).birthday = it
-        }
-    }
-}
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
-@Composable
-fun ChangeInfoScreenPreview() {
-    ShoppingAppTheme {
-        ChangeInfoScreen(
-            UserInfo(
-                avatarImage = R.drawable.avatar,
-                name = "Flores, Juanita",
-                gender = "Male",
-                birthday = Date(1, 1, 2000),
-                phoneNumber = "0987654321",
-                address = "123 Main St",
-                id = 0
-            )
-        ) {}
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun ChangeAvatarPreview() {
-    ChangeAvatar(
-        avatarImage = UserInfo(
-            avatarImage = R.drawable.avatar,
-            name = "Flores, Juanita",
-            gender = "Male",
-            birthday = Date(1, 1, 2000),
-            phoneNumber = "0987654321",
-            address = "123 Main St",
-            id = 0
-        ).avatarImage
-    )
-}
+
+
 
 @Preview(showBackground = true)
 @Composable
@@ -462,11 +394,11 @@ fun MyCheckBoxPreview() {
 @Preview(showBackground = true)
 @Composable
 fun GenderSelectionPreview() {
-    var gender by remember {
+    var sex by remember {
         mutableStateOf("Male")
     }
     ShoppingAppTheme {
-        GenderSelection(gender) { gender = it }
+        GenderSelection(sex) { sex = it }
     }
 }
 

@@ -47,7 +47,6 @@ val robotoMonoFont = FontFamily(
 )
 
 
-
 @Composable
 fun CustomTextField(
     value: String,
@@ -169,15 +168,12 @@ fun SignUpTextButton(onNavigateToSignUp: () -> Unit) {
 }
 
 
-
-
-
-
 @Composable
 fun AccountDrawerSheet(
     accountName: String,
     sex: Boolean,
     avatarImage: Int,
+    onClick: () -> Unit,
     modifier: Modifier
 ) {
 
@@ -214,7 +210,7 @@ fun AccountDrawerSheet(
 
         }
         TextButton(
-            onClick = { },
+            onClick = onClick,
             contentPadding = PaddingValues(),
             modifier = Modifier.align(Alignment.Bottom)
         ) {
@@ -258,18 +254,7 @@ fun SignUpTextButtonPreview() {
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun DrawerContentRowPreview() {
-    ShoppingAppTheme {
-        AccountDrawerSheet(
-            "Flores, Juanita",
-            false,
-            R.drawable.avatar,
-            modifier = Modifier
-        )
-    }
-}
+
 
 
 

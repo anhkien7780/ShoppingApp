@@ -18,6 +18,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,13 +29,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ChangePasswordScreen() {
+fun ChangePasswordScreen(onBack: () -> Unit, onSave: () -> Unit) {
     var oldPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -46,7 +48,7 @@ fun ChangePasswordScreen() {
                 fontFamily = rignteousFont,
             )
         }, navigationIcon = {
-            IconButton(onClick = { }) {
+            IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back"
@@ -56,31 +58,37 @@ fun ChangePasswordScreen() {
     }) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             Spacer(modifier = Modifier.padding(10.dp))
-            MyOutlinedTextFiled(
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
                 value = oldPassword,
-                onValuedChange = {
-                    oldPassword = it
-                },
-                label = "Old Password",
-                placeholder = "Enter your old password"
+                onValueChange = { oldPassword = it },
+                label = { Text(text = "Old Password") },
+                placeholder = { Text(text = "Enter password") },
+                singleLine = true,
+                maxLines = 1,
+                visualTransformation = PasswordVisualTransformation()
             )
             Spacer(modifier = Modifier.padding(10.dp))
-            MyOutlinedTextFiled(
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
                 value = newPassword,
-                onValuedChange = {
-                    newPassword = it
-                },
-                label = "New Password",
-                placeholder = "Enter your new password"
+                onValueChange = { newPassword = it },
+                label = { Text(text = "New Password") },
+                placeholder = { Text(text = "Enter password") },
+                singleLine = true,
+                maxLines = 1,
+                visualTransformation = PasswordVisualTransformation()
             )
             Spacer(modifier = Modifier.padding(10.dp))
-            MyOutlinedTextFiled(
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
                 value = confirmPassword,
-                onValuedChange = {
-                    confirmPassword = it
-                },
-                label = "Confirm Password",
-                placeholder = "Enter your new password again"
+                onValueChange = { confirmPassword = it },
+                label = { Text(text = "Confirm Password") },
+                placeholder = { Text(text = "Enter password") },
+                singleLine = true,
+                maxLines = 1,
+                visualTransformation = PasswordVisualTransformation()
             )
             Row(
                 modifier = Modifier
@@ -91,7 +99,7 @@ fun ChangePasswordScreen() {
             ) {
                 Button(
                     onClick = {
-
+                        onSave()
                     },
                     modifier = Modifier.fillMaxWidth(0.9f),
                     colors = ButtonDefaults.buttonColors(Color(218, 128, 128))
@@ -108,6 +116,6 @@ fun ChangePasswordScreen() {
 @Composable
 fun ChangePasswordScreenPreview() {
     ShoppingAppTheme {
-        ChangePasswordScreen()
+        ChangePasswordScreen({},{})
     }
 }

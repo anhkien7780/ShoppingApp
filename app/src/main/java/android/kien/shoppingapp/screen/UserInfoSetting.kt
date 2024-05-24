@@ -38,15 +38,19 @@ import androidx.compose.ui.unit.sp
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun UserSettingScreen(
-    userInfo: UserInfo
+fun UserInfoSettingScreen(
+    userInfo: UserInfo,
+    onBack: () -> Unit = {},
+    onNavToChangeUserInfo: () -> Unit = {},
+    onNavToChangePassword: () -> Unit = {},
+    onNavToAddresses: () -> Unit = {}
 ){
     Scaffold (
        topBar = {
            CenterAlignedTopAppBar(
                title = { Text(text = "ACCOUNT SETTING", fontFamily = rignteousFont) },
                navigationIcon = {
-                   IconButton(onClick = { /*TODO*/ }) {
+                   IconButton(onClick = { onBack() }) {
                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back button")
                    }
                }
@@ -58,9 +62,9 @@ fun UserSettingScreen(
             UserInfoComponent(userInfo = userInfo)
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
             Spacer(modifier = Modifier.padding(10.dp))
-            MyButton("Change Information")
-            MyButton("Change Password")
-            MyButton("Addresses")
+            MyButton("Change Information", onNavToChangeUserInfo)
+            MyButton("Change Password", onNavToChangePassword)
+            MyButton("Addresses", onNavToAddresses)
         }
 
     }
@@ -90,8 +94,8 @@ fun UserInfoComponent(userInfo: UserInfo){
 }
 
 @Composable
-fun MyButton(buttonText: String){
-    TextButton(onClick = { /*TODO*/ }, modifier = Modifier
+fun MyButton(buttonText: String, onNavToFunction: () -> Unit = {}){
+    TextButton(onClick = { onNavToFunction() }, modifier = Modifier
         .fillMaxWidth()
         .height(60.dp)
         .border(width = 1.dp, color = Color.Black)
@@ -111,7 +115,7 @@ fun MyButton(buttonText: String){
 @Composable
 fun AccountSettingScreenPreView(){
     ShoppingAppTheme {
-        UserSettingScreen(UserInfo(
+        UserInfoSettingScreen(UserInfo(
             avatarImage = R.drawable.avatar,
             name = "Flores, Juanita",
             gender = "Male",
