@@ -2,7 +2,6 @@ package android.kien.shoppingapp.screen
 
 import android.annotation.SuppressLint
 import android.kien.shoppingapp.R
-import android.kien.shoppingapp.data.UserInfo
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.models.Date
 import android.kien.shoppingapp.models.User
@@ -86,7 +85,7 @@ fun ChangeInfoScreen(userInfo: User, onSave: () -> Unit, onBack: () -> Unit) {
                 fontFamily = rignteousFont
             )
         }, navigationIcon = {
-            Button(onClick = { onBack()}) {
+            IconButton(onClick = { onBack()}) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back Button"

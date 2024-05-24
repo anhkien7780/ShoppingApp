@@ -7,12 +7,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -184,17 +187,21 @@ fun AccountDrawerSheet(
             .size(width = 320.dp, height = 60.dp)
             .background(color = Color(214, 214, 214)),
     ) {
-        Image(
-            painter = painterResource(id = avatarImage),
-            contentDescription = null,
-            contentScale = ContentScale.FillHeight,
-            modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape)
-                .border(0.1.dp, color = Color.Transparent),
-        )
+        Column (Modifier.weight(1f)){
+            Image(
+                painter = painterResource(id = avatarImage),
+                contentDescription = null,
+                contentScale = ContentScale.FillHeight,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(start = 5.dp)
+                    .size(50.dp)
+                    .clip(CircleShape)
+                    .border(0.1.dp, color = Color.Transparent),
+            )
+        }
         Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-        Column {
+        Column (Modifier.weight(2f)){
             Text(
                 text = accountName,
                 fontFamily = rignteousFont,
@@ -209,24 +216,29 @@ fun AccountDrawerSheet(
 
 
         }
-        TextButton(
+        IconButton(
             onClick = onClick,
-            contentPadding = PaddingValues(),
-            modifier = Modifier.align(Alignment.Bottom)
         ) {
-            Text(
-                text = "Account setting",
-                fontFamily = rignteousFont,
-                color = Color.Blue,
-                fontSize = 15.sp
-            )
+            Icon(imageVector = Icons.Default.Create, contentDescription = "Account Setting")
         }
     }
 }
 
 
 // Preview
-
+@Preview
+@Composable
+fun AccountDrawerSheetPreview() {
+    ShoppingAppTheme {
+        AccountDrawerSheet(
+            accountName = "Kien",
+            sex = true,
+            avatarImage = R.drawable.ic_launcher_background,
+            onClick = {},
+            modifier = Modifier
+        )
+    }
+}
 
 @Preview(showBackground = true)
 @Composable

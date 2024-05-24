@@ -7,19 +7,20 @@ import android.kien.shoppingapp.screen.CartScreen
 import android.kien.shoppingapp.screen.ChangeInfoScreen
 import android.kien.shoppingapp.screen.ChangePasswordScreen
 import android.kien.shoppingapp.screen.FirstSetupScreen
-import android.kien.shoppingapp.viewmodel.AccountViewModel
 import android.kien.shoppingapp.screen.ListProductScreen
 import android.kien.shoppingapp.screen.PaymentSuccessScreen
 import android.kien.shoppingapp.screen.ProductDetailsScreen
 import android.kien.shoppingapp.screen.SignInScreen
 import android.kien.shoppingapp.screen.SignUpScreen
 import android.kien.shoppingapp.screen.UserInfoSettingScreen
+import android.kien.shoppingapp.viewmodel.AccountViewModel
 import android.kien.shoppingapp.viewmodel.CartViewModel
-import android.kien.shoppingapp.viewmodel.LoginUiState
 import android.kien.shoppingapp.viewmodel.ProductViewModel
+import android.kien.shoppingapp.viewmodel.UserUiState
 import android.kien.shoppingapp.viewmodel.UserViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -43,6 +44,7 @@ fun MyAppNavHost(
             SignInScreen(
                 accountViewModel = accountViewModel,
                 cartViewModel = cartViewModel,
+                userViewModel = userViewModel,
                 onNavigateToSignUp = { navController.navigate(Screen.SignUpScreen.route) },
                 onSuccessfulSignIn = { navController.navigate(Screen.ListProductsScreen.route) },
                 loginUiState = accountViewModel.loginUiState
@@ -61,17 +63,23 @@ fun MyAppNavHost(
         }
 
         composable(route = Screen.ListProductsScreen.route) {
-            ListProductScreen(
-                navController = navController,
-                productViewModel = productViewModel,
-                onNavigateToCart = { navController.navigate(Screen.CartScreen.route) },
-                onLogout = {
-                    accountViewModel.logout()
-                    navController.navigate(route = Screen.SignInScreen.route)
-                },
-                onClick = { navController.navigate(Screen.UserInfoSettingScreen.route) }
+            if (userViewModel.userUiState == UserUiState.Success) {
 
-            )
+                ListProductScreen(
+                    navController = navController,
+                    productViewModel = productViewModel,
+                    user = userViewModel.user.value!!,
+                    onNavigateToCart = { navController.navigate(Screen.CartScreen.route) },
+                    onLogout = {
+                        accountViewModel.logout()
+                        navController.navigate(route = Screen.SignInScreen.route)
+                    },
+                    onClick = { navController.navigate(Screen.UserInfoSettingScreen.route) }
+
+                )
+            } else if(userViewModel.userUiState == UserUiState.Loading){
+                CircularProgressIndicator()
+            }
         }
         composable(route = Screen.CartScreen.route) {
             CartScreen(
@@ -83,7 +91,7 @@ fun MyAppNavHost(
                 onQuantityChange = { productID, quantity ->
                     cartViewModel.updateCartQuantity(cartViewModel.cartID, productID, quantity)
                 },
-                onPaymentSuccess = {navController.navigate(Screen.PaymentSuccessScreen.route)}
+                onPaymentSuccess = { navController.navigate(Screen.PaymentSuccessScreen.route) }
             )
         }
 
@@ -96,7 +104,7 @@ fun MyAppNavHost(
                     productViewModel = productViewModel,
                     cartViewModel = cartViewModel,
                     navController = navController,
-                    onNavigateToCart = {navController.navigate(Screen.CartScreen.route)}
+                    onNavigateToCart = { navController.navigate(Screen.CartScreen.route) }
                 )
             }
         }
@@ -106,7 +114,7 @@ fun MyAppNavHost(
                 username = accountViewModel.username,
                 userViewModel = userViewModel,
 
-            ) {
+                ) {
                 navController.navigate(Screen.ListProductsScreen.route)
             }
         }
@@ -140,8 +148,8 @@ fun MyAppNavHost(
                 { navController.popBackStack() },
                 onBack = { navController.popBackStack() })
         }
-        composable(route = Screen.PaymentSuccessScreen.route){
-            PaymentSuccessScreen(onBackToHome = {navController.navigate(Screen.ListProductsScreen.route)})
+        composable(route = Screen.PaymentSuccessScreen.route) {
+            PaymentSuccessScreen(onBackToHome = { navController.navigate(Screen.ListProductsScreen.route) })
         }
 
     }

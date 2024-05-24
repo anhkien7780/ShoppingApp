@@ -8,6 +8,7 @@ import android.kien.shoppingapp.library.composable.robotoMonoFont
 import android.kien.shoppingapp.viewmodel.AccountViewModel
 import android.kien.shoppingapp.viewmodel.CartViewModel
 import android.kien.shoppingapp.viewmodel.LoginUiState
+import android.kien.shoppingapp.viewmodel.UserViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +42,7 @@ import androidx.compose.ui.unit.dp
 fun SignInScreen(
     cartViewModel: CartViewModel,
     accountViewModel: AccountViewModel,
+    userViewModel: UserViewModel,
     onNavigateToSignUp: () -> Unit,
     onSuccessfulSignIn: () -> Unit,
     loginUiState: LoginUiState
@@ -109,6 +111,7 @@ fun SignInScreen(
             is LoginUiState.Loading -> {CircularProgressIndicator()}
             is LoginUiState.Success -> {
                 onSuccessfulSignIn()
+                userViewModel.getUser(accountViewModel.username)
                 cartViewModel.getCart(accountViewModel.username)
             }
             is LoginUiState.Error -> {wrongPassword = true}

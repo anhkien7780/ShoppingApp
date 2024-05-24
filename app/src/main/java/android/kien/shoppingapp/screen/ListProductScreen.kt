@@ -3,6 +3,7 @@ package android.kien.shoppingapp.screen
 import android.kien.shoppingapp.R
 import android.kien.shoppingapp.library.composable.AccountDrawerSheet
 import android.kien.shoppingapp.library.composable.robotoMonoFont
+import android.kien.shoppingapp.models.User
 import android.kien.shoppingapp.navigation.Screen
 import android.kien.shoppingapp.viewmodel.ProductViewModel
 import android.widget.Toast
@@ -65,6 +66,7 @@ import kotlin.system.exitProcess
 @Composable
 fun ListProductScreen(
     navController: NavController,
+    user: User,
     productViewModel: ProductViewModel,
     onNavigateToCart: () -> Unit,
     onLogout: () -> Unit,
@@ -86,7 +88,11 @@ fun ListProductScreen(
         ModalDrawerSheet(content = {
             Spacer(modifier = Modifier.size(20.dp))
             AccountDrawerSheet(
-                "Flores, Juanita", false, R.drawable.avatar, modifier = Modifier, onClick = onClick
+                accountName = user.name,
+                sex = user.sex,
+                R.drawable.avatar,
+                modifier = Modifier,
+                onClick = onClick
             )
             Row(
                 modifier = Modifier
