@@ -77,7 +77,6 @@ fun ChangeInfoScreen(userInfo: User, onSave: () -> Unit, onBack: () -> Unit) {
     var birthday by remember {
         mutableStateOf(userInfo.getBirthDay())
     }
-
     Scaffold(topBar = {
         CenterAlignedTopAppBar(title = {
             Text(
@@ -139,9 +138,7 @@ fun ChangeInfoScreen(userInfo: User, onSave: () -> Unit, onBack: () -> Unit) {
                 }
             }
         }
-
     }
-
 }
 
 @Composable
