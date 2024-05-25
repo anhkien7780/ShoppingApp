@@ -28,6 +28,7 @@ class UserViewModel : ViewModel() {
             try {
                 userUiState = UserUiState.Loading
                 UserApi.retrofitService.addNewUser(user)
+                this@UserViewModel.user.value = user
                 userUiState = UserUiState.Success
             } catch (e: Exception){
                 userUiState = UserUiState.Error

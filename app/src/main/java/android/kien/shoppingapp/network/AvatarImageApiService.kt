@@ -10,10 +10,10 @@ import retrofit2.http.Path
 
 interface AvatarImageApiService{
     @Multipart
-    @POST("/avatar/add/{userID}")
-    suspend fun addImage(@Part image: MultipartBody.Part, @Path("userID") userID: Int)
+    @POST("/avatar/add/{username}")
+    suspend fun addAvatarImage(@Part image: MultipartBody.Part, @Path("username") username: String)
     @GET("avatar/get/{userID}")
-    suspend fun getAvatar(@Path("userID") userID: String): Image
+    suspend fun getAvatar(@Path("username") username: String): Image
 }
 
 object AvatarImageApi{

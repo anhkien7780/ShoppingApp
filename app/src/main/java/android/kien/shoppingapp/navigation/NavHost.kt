@@ -14,6 +14,7 @@ import android.kien.shoppingapp.screen.SignInScreen
 import android.kien.shoppingapp.screen.SignUpScreen
 import android.kien.shoppingapp.screen.UserInfoSettingScreen
 import android.kien.shoppingapp.viewmodel.AccountViewModel
+import android.kien.shoppingapp.viewmodel.AvatarImageViewModel
 import android.kien.shoppingapp.viewmodel.CartViewModel
 import android.kien.shoppingapp.viewmodel.ProductViewModel
 import android.kien.shoppingapp.viewmodel.UserUiState
@@ -36,6 +37,7 @@ fun MyAppNavHost(
     cartViewModel: CartViewModel = viewModel(),
     accountViewModel: AccountViewModel = viewModel(),
     userViewModel: UserViewModel = viewModel(),
+    avatarImageViewModel: AvatarImageViewModel = viewModel(),
     productViewModel: ProductViewModel = viewModel(),
     startDestination: String = Screen.SignInScreen.route
 ) {
@@ -64,7 +66,6 @@ fun MyAppNavHost(
 
         composable(route = Screen.ListProductsScreen.route) {
             if (userViewModel.userUiState == UserUiState.Success) {
-
                 ListProductScreen(
                     navController = navController,
                     productViewModel = productViewModel,
@@ -77,7 +78,7 @@ fun MyAppNavHost(
                     onClick = { navController.navigate(Screen.UserInfoSettingScreen.route) }
 
                 )
-            } else if(userViewModel.userUiState == UserUiState.Loading){
+            } else if (userViewModel.userUiState == UserUiState.Loading) {
                 CircularProgressIndicator()
             }
         }
@@ -113,8 +114,8 @@ fun MyAppNavHost(
                 context = LocalContext.current,
                 username = accountViewModel.username,
                 userViewModel = userViewModel,
-
-                ) {
+                avatarImageViewModel = avatarImageViewModel,
+            ) {
                 navController.navigate(Screen.ListProductsScreen.route)
             }
         }

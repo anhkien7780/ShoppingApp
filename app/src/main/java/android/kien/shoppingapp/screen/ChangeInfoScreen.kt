@@ -142,7 +142,7 @@ fun ChangeInfoScreen(userInfo: User, onSave: () -> Unit, onBack: () -> Unit) {
 }
 
 @Composable
-fun ChangeAvatar(placeholder: Int) {
+fun ChangeAvatar(placeholder: Int, onUriChange: (Uri?) -> Unit = {}) {
     var uri by remember {
         mutableStateOf<Uri?>(null)
     }
@@ -150,6 +150,7 @@ fun ChangeAvatar(placeholder: Int) {
         contract = ActivityResultContracts.PickVisualMedia(),
     ) {
         uri = it
+        onUriChange(it)
     }
     Row(
         modifier = Modifier

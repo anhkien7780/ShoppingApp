@@ -6,9 +6,12 @@ import android.kien.shoppingapp.R
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.models.Date
 import android.kien.shoppingapp.models.User
-import android.kien.shoppingapp.viewmodel.AccountViewModel
+import android.kien.shoppingapp.viewmodel.AvatarImageUiState
+import android.kien.shoppingapp.viewmodel.AvatarImageViewModel
 import android.kien.shoppingapp.viewmodel.UserViewModel
+import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -47,7 +51,8 @@ fun FirstSetupScreen(
     context: Context,
     username: String,
     userViewModel: UserViewModel,
-    onAddUserInfo: () -> Unit
+    avatarImageViewModel: AvatarImageViewModel,
+    onAddSuccess: () -> Unit
 ) {
     var name by remember {
         mutableStateOf("")
@@ -61,6 +66,7 @@ fun FirstSetupScreen(
     var phoneNumber by remember {
         mutableStateOf("")
     }
+    var uri: Uri? by remember { mutableStateOf(null) }
 
     Scaffold(topBar = {
         CenterAlignedTopAppBar(title = {
@@ -71,10 +77,11 @@ fun FirstSetupScreen(
         })
     }) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
-            ChangeAvatar(placeholder = R.drawable.default_logo)
+            ChangeAvatar(placeholder = R.drawable.default_logo, onUriChange = { uri = it })
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
             Spacer(modifier = Modifier.padding(10.dp))
             MyOutlinedTextFiled(
@@ -101,6 +108,21 @@ fun FirstSetupScreen(
             ) {
                 birthDay = it.toLocalDate()
             }
+            when (avatarImageViewModel.avatarImageUiState) {
+                is AvatarImageUiState.Loading -> {
+                    CircularProgressIndicator()
+                }
+
+                is AvatarImageUiState.Success -> {
+                    Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                    onAddSuccess()
+                }
+
+                is AvatarImageUiState.Error -> {
+                    Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+                }
+                is AvatarImageUiState.Idle -> {}
+            }
 
             Row(
                 modifier = Modifier
@@ -110,6 +132,7 @@ fun FirstSetupScreen(
             ) {
                 Button(
                     onClick = {
+                        avatarImageViewModel.uploadAvatarImage(uri, context, username)
                         userViewModel.addUser(
                             User(
                                 name,
@@ -120,7 +143,7 @@ fun FirstSetupScreen(
                                 username
                             )
                         )
-                        onAddUserInfo()
+                        onAddSuccess()
                     },
                     modifier = Modifier
                         .align(Alignment.Bottom)
@@ -130,6 +153,7 @@ fun FirstSetupScreen(
                     Text(text = "Save", fontFamily = rignteousFont, color = Color.Black)
                 }
             }
+
         }
 
     }
@@ -143,6 +167,7 @@ fun FirstSetupScreenPreview() {
         context = LocalContext.current,
         username = "",
         userViewModel = UserViewModel(),
-        onAddUserInfo = {}
+        avatarImageViewModel = AvatarImageViewModel(),
+        onAddSuccess = {}
     )
 }
