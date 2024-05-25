@@ -90,6 +90,16 @@ fun SignInScreen(
                 )
             }
         }
+        when (loginUiState) {
+            is LoginUiState.Idle -> {}
+            is LoginUiState.Loading -> {CircularProgressIndicator()}
+            is LoginUiState.Success -> {
+                onSuccessfulSignIn()
+                userViewModel.getUser(accountViewModel.username)
+                cartViewModel.getCart(accountViewModel.username)
+            }
+            is LoginUiState.Error -> {wrongPassword = true}
+        }
         Spacer(modifier = Modifier.padding(top = 20.dp))
         Button(
             onClick = {
@@ -106,16 +116,7 @@ fun SignInScreen(
                 color = Color.Black
             )
         }
-        when (loginUiState) {
-            is LoginUiState.Idle -> {}
-            is LoginUiState.Loading -> {CircularProgressIndicator()}
-            is LoginUiState.Success -> {
-                onSuccessfulSignIn()
-                userViewModel.getUser(accountViewModel.username)
-                cartViewModel.getCart(accountViewModel.username)
-            }
-            is LoginUiState.Error -> {wrongPassword = true}
-        }
+
         SignUpTextButton(onNavigateToSignUp)
         Text(
             text = if (wrongPassword) "Sorry, your password is incorrect or your account isn’t exits"

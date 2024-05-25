@@ -20,7 +20,7 @@ sealed class UserUiState {
 }
 
 class UserViewModel : ViewModel() {
-    var userUiState: UserUiState by mutableStateOf(UserUiState.Loading)
+    var userUiState: UserUiState by mutableStateOf(UserUiState.Idle)
         private set
     var user = MutableLiveData<User>()
     fun addUser(user: User) {
@@ -28,12 +28,17 @@ class UserViewModel : ViewModel() {
             try {
                 userUiState = UserUiState.Loading
                 UserApi.retrofitService.addNewUser(user)
+                this@UserViewModel.user.value = user
                 userUiState = UserUiState.Success
             } catch (e: Exception){
                 userUiState = UserUiState.Error
                 println(e.message)
             }
         }
+    }
+
+    fun setUserUiStateToIdle(){
+        userUiState = UserUiState.Idle
     }
 
     fun getUser(username: String){

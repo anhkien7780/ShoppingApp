@@ -77,6 +77,9 @@ fun ChangeInfoScreen(userInfo: User, onSave: () -> Unit, onBack: () -> Unit) {
     var birthday by remember {
         mutableStateOf(userInfo.getBirthDay())
     }
+    var uri by remember {
+        mutableStateOf<Uri?>(null)
+    }
     Scaffold(topBar = {
         CenterAlignedTopAppBar(title = {
             Text(
@@ -97,7 +100,7 @@ fun ChangeInfoScreen(userInfo: User, onSave: () -> Unit, onBack: () -> Unit) {
             modifier = Modifier.padding(innerPadding)
         ) {
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
-            ChangeAvatar(placeholder = R.drawable.default_logo)
+            ChangeAvatar(placeholder = R.drawable.default_logo, onUriChange = {uri = it})
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
             Spacer(modifier = Modifier.padding(10.dp))
             MyOutlinedTextFiled(
@@ -142,7 +145,7 @@ fun ChangeInfoScreen(userInfo: User, onSave: () -> Unit, onBack: () -> Unit) {
 }
 
 @Composable
-fun ChangeAvatar(placeholder: Int) {
+fun ChangeAvatar(placeholder: Int, onUriChange: (Uri?) -> Unit) {
     var uri by remember {
         mutableStateOf<Uri?>(null)
     }
@@ -150,6 +153,7 @@ fun ChangeAvatar(placeholder: Int) {
         contract = ActivityResultContracts.PickVisualMedia(),
     ) {
         uri = it
+        onUriChange(it)
     }
     Row(
         modifier = Modifier

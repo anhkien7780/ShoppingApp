@@ -30,7 +30,7 @@ class AvatarImageViewModel : ViewModel() {
     var avatarImageUiState: AvatarImageUiState by mutableStateOf(AvatarImageUiState.Idle)
         private set
 
-    fun uploadAvatarImage(uri: Uri?, context: Context, userID: Int) {
+    fun uploadAvatarImage(uri: Uri?, context: Context, username: String) {
         viewModelScope.launch {
             try {
                 avatarImageUiState = AvatarImageUiState.Loading
@@ -43,8 +43,8 @@ class AvatarImageViewModel : ViewModel() {
                 val byteArray = byteArrayOutputStream.toByteArray()
                 val imageMediaType = "image/png".toMediaType()
                 val imageRequestBody = byteArray.toRequestBody(imageMediaType)
-                val imagePart = MultipartBody.Part.createFormData("image", "${userID}_avatar.png", imageRequestBody)
-                AvatarImageApi.retrofitService.addImage(imagePart, userID)
+                val imagePart = MultipartBody.Part.createFormData("image", "${username}_avatar.png", imageRequestBody)
+                AvatarImageApi.retrofitService.addImage(imagePart, username)
                 avatarImageUiState = AvatarImageUiState.Success
             } catch (e: Exception) {
                 avatarImageUiState = AvatarImageUiState.Error

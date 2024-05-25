@@ -209,7 +209,7 @@ fun AccountDrawerSheet(
             )
 
             Text(
-                text = if (!sex) "Male" else "Female",
+                text = if (sex) "Male" else "Female",
                 fontFamily = rignteousFont,
                 fontSize = 15.sp,
             )

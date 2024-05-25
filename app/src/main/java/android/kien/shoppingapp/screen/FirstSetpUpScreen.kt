@@ -6,9 +6,14 @@ import android.kien.shoppingapp.R
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.models.Date
 import android.kien.shoppingapp.models.User
-import android.kien.shoppingapp.viewmodel.AccountViewModel
+import android.kien.shoppingapp.viewmodel.AvatarImageUiState
+import android.kien.shoppingapp.viewmodel.AvatarImageViewModel
+import android.kien.shoppingapp.viewmodel.CartViewModel
+import android.kien.shoppingapp.viewmodel.UserUiState
 import android.kien.shoppingapp.viewmodel.UserViewModel
+import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +25,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -47,6 +53,7 @@ fun FirstSetupScreen(
     context: Context,
     username: String,
     userViewModel: UserViewModel,
+    avatarImageViewModel: AvatarImageViewModel,
     onAddUserInfo: () -> Unit
 ) {
     var name by remember {
@@ -61,7 +68,9 @@ fun FirstSetupScreen(
     var phoneNumber by remember {
         mutableStateOf("")
     }
-
+    var uri by remember {
+        mutableStateOf<Uri?>(null)
+    }
     Scaffold(topBar = {
         CenterAlignedTopAppBar(title = {
             Text(
@@ -71,10 +80,11 @@ fun FirstSetupScreen(
         })
     }) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
-            ChangeAvatar(placeholder = R.drawable.default_logo)
+            ChangeAvatar(placeholder = R.drawable.default_logo, onUriChange = {uri = it})
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
             Spacer(modifier = Modifier.padding(10.dp))
             MyOutlinedTextFiled(
@@ -101,6 +111,21 @@ fun FirstSetupScreen(
             ) {
                 birthDay = it.toLocalDate()
             }
+            when(userViewModel.userUiState){
+                is UserUiState.Loading -> {
+                    CircularProgressIndicator()
+                }
+                is UserUiState.Success -> {
+                    avatarImageViewModel.uploadAvatarImage(uri, context, username)
+                    userViewModel.getUser(username)
+                    userViewModel.setUserUiStateToIdle()
+                    onAddUserInfo()
+                }
+                is UserUiState.Error -> {
+                    Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+                }
+                is UserUiState.Idle -> {}
+            }
 
             Row(
                 modifier = Modifier
@@ -120,7 +145,6 @@ fun FirstSetupScreen(
                                 username
                             )
                         )
-                        onAddUserInfo()
                     },
                     modifier = Modifier
                         .align(Alignment.Bottom)
@@ -143,6 +167,7 @@ fun FirstSetupScreenPreview() {
         context = LocalContext.current,
         username = "",
         userViewModel = UserViewModel(),
+        avatarImageViewModel = AvatarImageViewModel(),
         onAddUserInfo = {}
     )
 }
