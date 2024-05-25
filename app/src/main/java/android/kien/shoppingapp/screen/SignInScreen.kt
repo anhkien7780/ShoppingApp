@@ -6,6 +6,7 @@ import android.kien.shoppingapp.library.composable.SignUpTextButton
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.library.composable.robotoMonoFont
 import android.kien.shoppingapp.viewmodel.AccountViewModel
+import android.kien.shoppingapp.viewmodel.AvatarImageViewModel
 import android.kien.shoppingapp.viewmodel.CartViewModel
 import android.kien.shoppingapp.viewmodel.LoginUiState
 import android.kien.shoppingapp.viewmodel.UserViewModel
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.dp
 fun SignInScreen(
     cartViewModel: CartViewModel,
     accountViewModel: AccountViewModel,
+    avatarImageViewModel: AvatarImageViewModel,
     userViewModel: UserViewModel,
     onNavigateToSignUp: () -> Unit,
     onSuccessfulSignIn: () -> Unit,
@@ -95,6 +97,7 @@ fun SignInScreen(
             is LoginUiState.Loading -> {CircularProgressIndicator()}
             is LoginUiState.Success -> {
                 onSuccessfulSignIn()
+                avatarImageViewModel.getAvatarImage(accountViewModel.username)
                 userViewModel.getUser(accountViewModel.username)
                 cartViewModel.getCart(accountViewModel.username)
             }

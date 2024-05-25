@@ -38,6 +38,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 
 
 val rignteousFont = FontFamily(
@@ -175,7 +176,7 @@ fun SignUpTextButton(onNavigateToSignUp: () -> Unit) {
 fun AccountDrawerSheet(
     accountName: String,
     sex: Boolean,
-    avatarImage: Int,
+    avatarUrl: String?,
     onClick: () -> Unit,
     modifier: Modifier
 ) {
@@ -188,8 +189,8 @@ fun AccountDrawerSheet(
             .background(color = Color(214, 214, 214)),
     ) {
         Column (Modifier.weight(1f)){
-            Image(
-                painter = painterResource(id = avatarImage),
+            AsyncImage(
+                model = avatarUrl,
                 contentDescription = null,
                 contentScale = ContentScale.FillHeight,
                 modifier = Modifier
@@ -226,19 +227,7 @@ fun AccountDrawerSheet(
 
 
 // Preview
-@Preview
-@Composable
-fun AccountDrawerSheetPreview() {
-    ShoppingAppTheme {
-        AccountDrawerSheet(
-            accountName = "Kien",
-            sex = true,
-            avatarImage = R.drawable.ic_launcher_background,
-            onClick = {},
-            modifier = Modifier
-        )
-    }
-}
+
 
 @Preview(showBackground = true)
 @Composable

@@ -67,6 +67,7 @@ import kotlin.system.exitProcess
 fun ListProductScreen(
     navController: NavController,
     user: User,
+    avatarUrl: String?,
     productViewModel: ProductViewModel,
     onNavigateToCart: () -> Unit,
     onLogout: () -> Unit,
@@ -81,6 +82,7 @@ fun ListProductScreen(
             exitProcess(0)
         }
     }
+    println(avatarUrl)
     if (backPressedCount == 1) {
         Toast.makeText(LocalContext.current, "Press back again to exit", Toast.LENGTH_SHORT).show()
     }
@@ -90,7 +92,7 @@ fun ListProductScreen(
             AccountDrawerSheet(
                 accountName = user.name,
                 sex = user.sex,
-                R.drawable.avatar,
+                avatarUrl = avatarUrl,
                 modifier = Modifier,
                 onClick = onClick
             )
