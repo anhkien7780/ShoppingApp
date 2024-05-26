@@ -10,7 +10,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 
-private const val BASE_URL = "http://192.168.1.12:8080"
+private const val BASE_URL = "https://one-definitely-kingfish.ngrok-free.app"
 
 val retrofit: Retrofit = Retrofit.Builder()
     .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
@@ -22,7 +22,6 @@ interface AccountApiService{
     suspend fun login(@Body account: Account)
     @POST("/accounts/register")
     suspend fun register(@Body account: Account)
-
 }
 object AccountApi{
     val retrofitService: AccountApiService by lazy {
