@@ -13,10 +13,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 sealed class CartUiState {
-    object Idle : CartUiState()
-    object Loading : CartUiState()
-    object Success : CartUiState()
-    object Error : CartUiState()
+    data object Idle : CartUiState()
+    data object Loading : CartUiState()
+    data object Success : CartUiState()
+    data object Error : CartUiState()
 }
 
 class CartViewModel : ViewModel() {
@@ -25,6 +25,7 @@ class CartViewModel : ViewModel() {
         private set
     private var _listCartItems = MutableStateFlow(listOf<CartItem>())
     val listCartItems: StateFlow<List<CartItem>> = _listCartItems
+    @Suppress("FunctionName")
     private fun _getCart(username: String) {
         viewModelScope.launch {
             try {
@@ -110,6 +111,7 @@ class CartViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 CartApi.retrofitService.deleteCartItem(cartID, productID)
+                _listCartItems.value = _listCartItems.value.filter { it.productID != productID }
             } catch (e: Exception) {
                 e.printStackTrace()
                 println("Delete cart failed")

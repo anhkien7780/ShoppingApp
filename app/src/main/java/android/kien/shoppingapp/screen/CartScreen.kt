@@ -108,7 +108,9 @@ fun CartScreen(
                         CartItemRow(
                             product = product,
                             quantity = quantity,
-                            onDeleteClick = { },
+                            onDeleteClick = {
+                                cartViewModel.deleteCartItem(cartViewModel.cartID, productID)
+                            },
                             onQuantityChange = {
                                 quantity = it
                                 cartViewModel.updateCartQuantity(
