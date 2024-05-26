@@ -208,25 +208,17 @@ fun ProductDetailsScreen(
                 when (cartViewModel.cartUiState) {
                     is CartUiState.Idle -> {}
                     is CartUiState.Loading -> {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            Toast.makeText(context, "Adding to cart", Toast.LENGTH_SHORT).show()
-                        }
                         CircularProgressIndicator()
                     }
 
                     is CartUiState.Success -> {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            Toast.makeText(context, "Added to cart", Toast.LENGTH_SHORT).show()
-                        }
-
-
+                        Toast.makeText(context, "Added to cart", Toast.LENGTH_SHORT).show()
+                        cartViewModel.setCartUiStateToIdle()
                     }
 
                     is CartUiState.Error -> {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            Toast.makeText(context, "Error to adding cart", Toast.LENGTH_SHORT)
-                                .show()
-                        }
+                        Toast.makeText(context, "Error to adding cart", Toast.LENGTH_LONG)
+                            .show()
                     }
 
                 }

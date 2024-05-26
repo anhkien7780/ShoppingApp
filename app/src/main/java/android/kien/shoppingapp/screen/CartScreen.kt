@@ -3,7 +3,6 @@ package android.kien.shoppingapp.screen
 import android.annotation.SuppressLint
 import android.kien.shoppingapp.R
 import android.kien.shoppingapp.library.composable.rignteousFont
-import android.kien.shoppingapp.models.CartItem
 import android.kien.shoppingapp.viewmodel.CartViewModel
 import android.kien.shoppingapp.viewmodel.ProductViewModel
 import androidx.compose.foundation.border
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,10 +29,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,18 +52,16 @@ import coil.compose.AsyncImage
 import com.example.models.Product
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState")
 @Composable
 fun CartScreen(
     navController: NavHostController,
     cartViewModel: CartViewModel,
     productViewModel: ProductViewModel,
     onBackClick: () -> Unit,
-    onDeleteClick: (Int) -> Unit,
     onPaymentSuccess: () -> Unit,
-    onQuantityChange: (Int, Int) -> Unit
 ) {
-    val listCartItems = cartViewModel.listCartItems.value!!
+    val listCartItems = cartViewModel.listCartItems.collectAsState()
     Scaffold(topBar = {
         CenterAlignedTopAppBar(title = {
             Text(
@@ -78,50 +76,62 @@ fun CartScreen(
             }
         })
     }) { innerPadding ->
-        when (productViewModel.productList.value?.isEmpty()) {
+        when (listCartItems.value.isEmpty()) {
             true -> {
                 Column(
-                    modifier = Modifier.padding(innerPadding),
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(text = "No items in cart")
                 }
             }
+
             false -> {
-                var subTotal = 0.0f
-                listCartItems.forEach { cartItem ->
-                    val product = productViewModel.productList.value!![cartItem.productID]
-                    subTotal += product.price * cartItem.quantity
+                val subTotal = derivedStateOf {
+                    var total = 0.0f
+                    listCartItems.value.forEach { cartItem ->
+                        val product = productViewModel.productList.value!![cartItem.productID]
+                        total += product.price * cartItem.quantity
+                    }
+                    total
                 }
                 LazyColumn(
                     modifier = Modifier.padding(innerPadding)
                 ) {
-                    items(listCartItems.size) { index ->
-                        val productID = listCartItems[index].productID
+                    items(listCartItems.value.size) { index ->
+                        val productID = listCartItems.value[index].productID
                         val product = productViewModel.productList.value!![productID]
-                        val quantity by remember { mutableIntStateOf(listCartItems[index].quantity) }
+                        var quantity by remember { mutableIntStateOf(listCartItems.value[index].quantity) }
                         CartItemRow(
                             product = product,
                             quantity = quantity,
-                            onDeleteClick = { onDeleteClick(index) },
-                            onQuantityChange = { onQuantityChange(index, it) }
+                            onDeleteClick = { },
+                            onQuantityChange = {
+                                quantity = it
+                                cartViewModel.updateCartQuantity(
+                                    cartViewModel.cartID,
+                                    productID,
+                                    it
+                                )
+                            }
                         )
                     }
                     item {
-                        Text(text = "SubTotal: $subTotal")
+                        Text(text = "SubTotal: ${subTotal.value}")
                         Spacer(modifier = Modifier.padding(10.dp))
-                        Button(onClick = { onPaymentSuccess() }, modifier = Modifier.fillMaxWidth()) {
+                        Button(
+                            onClick = { onPaymentSuccess() },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
                             Text(text = "Checkout")
                         }
                     }
 
                 }
 
-            }
-
-            null -> {
-                TODO()
             }
         }
 
@@ -192,7 +202,7 @@ fun QuantityDialog(quantity: Int, onQuantityChange: (Int) -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         var enabled by remember {
-            mutableStateOf(false)
+            mutableStateOf(quantity > 1)
         }
         IconButton(onClick = {
             onQuantityChange(quantity + 1)
@@ -222,6 +232,21 @@ fun QuantityDialog(quantity: Int, onQuantityChange: (Int) -> Unit) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun CartItemRowPreview() {
+    CartItemRow(
+        product = Product(
+            1,
+            "product 1",
+            0.4f,
+            "",
+            ""
+        ),
+        quantity = 1,
+        {}, {}
+    )
+}
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Preview(showBackground = true)

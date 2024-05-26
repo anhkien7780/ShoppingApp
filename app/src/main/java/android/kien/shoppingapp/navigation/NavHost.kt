@@ -91,10 +91,6 @@ fun MyAppNavHost(
                 cartViewModel = cartViewModel,
                 productViewModel = productViewModel,
                 onBackClick = { navController.popBackStack() },
-                onDeleteClick = { cartViewModel.deleteCartItem(cartViewModel.cartID, it) },
-                onQuantityChange = { productID, quantity ->
-                    cartViewModel.updateCartQuantity(cartViewModel.cartID, productID, quantity)
-                },
                 onPaymentSuccess = { navController.navigate(Screen.PaymentSuccessScreen.route) }
             )
         }

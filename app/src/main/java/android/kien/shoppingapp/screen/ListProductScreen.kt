@@ -82,7 +82,6 @@ fun ListProductScreen(
             exitProcess(0)
         }
     }
-    println(avatarUrl)
     if (backPressedCount == 1) {
         Toast.makeText(LocalContext.current, "Press back again to exit", Toast.LENGTH_SHORT).show()
     }
