@@ -177,7 +177,7 @@ fun AccountDrawerSheet(
     accountName: String,
     sex: Boolean,
     avatarUrl: String?,
-    onClick: () -> Unit,
+    onNavigateToAccountSetting: () -> Unit,
     modifier: Modifier
 ) {
 
@@ -218,7 +218,7 @@ fun AccountDrawerSheet(
 
         }
         IconButton(
-            onClick = onClick,
+            onClick = onNavigateToAccountSetting,
         ) {
             Icon(imageVector = Icons.Default.Create, contentDescription = "Account Setting")
         }

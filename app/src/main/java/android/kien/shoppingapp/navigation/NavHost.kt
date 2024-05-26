@@ -80,7 +80,7 @@ fun MyAppNavHost(
                         accountViewModel.logout()
                         navController.navigate(route = Screen.SignInScreen.route)
                     },
-                    onClick = { navController.navigate(Screen.UserInfoSettingScreen.route) }
+                    onNavigateToAccountSetting = { navController.navigate(Screen.UserInfoSettingScreen.route) }
 
                 )
             }
@@ -121,7 +121,8 @@ fun MyAppNavHost(
 
         composable(route = Screen.UserInfoSettingScreen.route) {
             UserInfoSettingScreen(
-                userInfo = allUserInfo[0],
+                user = userViewModel.user.value!!,
+                avatarImageUrl = avatarImageViewModel.avatarImage!!.url,
                 onBack = { navController.popBackStack() },
                 onNavToAddresses = { navController.navigate(Screen.AddressesScreen.route) },
                 onNavToChangePassword = { navController.navigate(Screen.ChangePasswordScreen.route) },

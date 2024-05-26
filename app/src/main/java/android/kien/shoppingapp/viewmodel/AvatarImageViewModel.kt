@@ -49,6 +49,7 @@ class AvatarImageViewModel : ViewModel() {
                     imageRequestBody
                 )
                 AvatarImageApi.retrofitService.addImage(imagePart, username)
+                avatarImage = AvatarImage(uri.toString(), username)
                 avatarImageUiState = AvatarImageUiState.Success
             } catch (e: Exception) {
                 avatarImageUiState = AvatarImageUiState.Error

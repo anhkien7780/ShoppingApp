@@ -67,7 +67,11 @@ import java.util.Calendar
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ChangeInfoScreen(userInfo: User, onSave: () -> Unit, onBack: () -> Unit) {
+fun ChangeInfoScreen(
+    userInfo: User,
+    onSave: () -> Unit,
+    onBack: () -> Unit
+) {
     var name by remember {
         mutableStateOf(userInfo.name)
     }

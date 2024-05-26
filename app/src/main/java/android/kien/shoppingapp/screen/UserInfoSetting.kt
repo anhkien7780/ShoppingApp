@@ -2,9 +2,8 @@ package android.kien.shoppingapp.screen
 
 import android.annotation.SuppressLint
 import android.kien.shoppingapp.R
-import android.kien.shoppingapp.data.Date
-import android.kien.shoppingapp.data.UserInfo
 import android.kien.shoppingapp.library.composable.rignteousFont
+import android.kien.shoppingapp.models.User
 import android.kien.shoppingapp.ui.theme.ShoppingAppTheme
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -34,32 +33,37 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun UserInfoSettingScreen(
-    userInfo: UserInfo,
+    user: User,
+    avatarImageUrl: String,
     onBack: () -> Unit = {},
     onNavToChangeUserInfo: () -> Unit = {},
     onNavToChangePassword: () -> Unit = {},
     onNavToAddresses: () -> Unit = {}
-){
-    Scaffold (
-       topBar = {
-           CenterAlignedTopAppBar(
-               title = { Text(text = "ACCOUNT SETTING", fontFamily = rignteousFont) },
-               navigationIcon = {
-                   IconButton(onClick = { onBack() }) {
-                       Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back button")
-                   }
-               }
-           )
-       }
-    ) {innerPadding ->
-        Column (modifier = Modifier.padding(innerPadding)) {
+) {
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(text = "ACCOUNT SETTING", fontFamily = rignteousFont) },
+                navigationIcon = {
+                    IconButton(onClick = { onBack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back button"
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
-            UserInfoComponent(userInfo = userInfo)
+            UserInfoComponent(user = user, avatarImageUrl = avatarImageUrl)
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
             Spacer(modifier = Modifier.padding(10.dp))
             MyButton("Change Information", onNavToChangeUserInfo)
@@ -71,34 +75,35 @@ fun UserInfoSettingScreen(
 }
 
 @Composable
-fun UserInfoComponent(userInfo: UserInfo){
+fun UserInfoComponent(user: User, avatarImageUrl: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(100.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
-    ){
-        Image(
-            painter = painterResource(id = userInfo.avatarImage),
+    ) {
+        AsyncImage(
+            model = avatarImageUrl,
             contentDescription = "Avatar",
             modifier = Modifier.size(90.dp)
         )
         Spacer(modifier = Modifier.padding(10.dp))
         Column {
-            Text(text = userInfo.name, fontFamily = rignteousFont, fontSize = 20.sp)
-            Text(text = userInfo.gender, fontFamily = rignteousFont)
-            Text(text = userInfo.phoneNumber, fontFamily = rignteousFont)
+            Text(text = user.name, fontFamily = rignteousFont, fontSize = 20.sp)
+            Text(text = if (user.sex) "Male" else "Female", fontFamily = rignteousFont)
+            Text(text = user.phoneNumber, fontFamily = rignteousFont)
         }
     }
 }
 
 @Composable
-fun MyButton(buttonText: String, onNavToFunction: () -> Unit = {}){
-    TextButton(onClick = { onNavToFunction() }, modifier = Modifier
-        .fillMaxWidth()
-        .height(60.dp)
-        .border(width = 1.dp, color = Color.Black)
+fun MyButton(buttonText: String, onNavToFunction: () -> Unit = {}) {
+    TextButton(
+        onClick = { onNavToFunction() }, modifier = Modifier
+            .fillMaxWidth()
+            .height(60.dp)
+            .border(width = 1.dp, color = Color.Black)
     ) {
         Text(
             text = buttonText,
@@ -113,37 +118,40 @@ fun MyButton(buttonText: String, onNavToFunction: () -> Unit = {}){
 
 @Preview(showBackground = true)
 @Composable
-fun AccountSettingScreenPreView(){
+fun AccountSettingScreenPreView() {
     ShoppingAppTheme {
-        UserInfoSettingScreen(UserInfo(
-            avatarImage = R.drawable.avatar,
-            name = "Flores, Juanita",
-            gender = "Male",
-            birthday = Date(1, 1, 2000),
-            phoneNumber = "0987654321",
-            address = "123 Main St",
-            id = 0
-        ))
+        UserInfoSettingScreen(
+            User(
+                name = "Flores",
+                birthDay = "27/10/2002",
+                age = 22,
+                sex = true,
+                phoneNumber = "0987654321",
+                username = ""
+            ),
+            avatarImageUrl = null.toString()
+        )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun UserInfoPreview(){
-    UserInfoComponent(userInfo = UserInfo(
-        avatarImage = R.drawable.avatar,
-        name = "Flores, Juanita",
-        gender = "Male",
-        birthday = Date(1, 1, 2000),
-        phoneNumber = "0987654321",
-        address = "123 Main St",
-        id = 0
-    ))
+fun UserInfoPreview() {
+    UserInfoComponent(
+        User(
+            name = "Flores",
+            birthDay = "27/10/2002",
+            age = 22,
+            sex = true,
+            phoneNumber = "0987654321",
+            username = ""
+        ), avatarImageUrl = null.toString()
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
-fun MyButtonPreview(){
+fun MyButtonPreview() {
     ShoppingAppTheme {
         MyButton("My Button")
     }

@@ -71,7 +71,7 @@ fun ListProductScreen(
     productViewModel: ProductViewModel,
     onNavigateToCart: () -> Unit,
     onLogout: () -> Unit,
-    onClick: () -> Unit
+    onNavigateToAccountSetting: () -> Unit
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -93,7 +93,7 @@ fun ListProductScreen(
                 sex = user.sex,
                 avatarUrl = avatarUrl,
                 modifier = Modifier,
-                onClick = onClick
+                onNavigateToAccountSetting = onNavigateToAccountSetting
             )
             Row(
                 modifier = Modifier
