@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -62,6 +63,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -133,18 +135,40 @@ fun ChangeInfoScreen(
             )
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
             Spacer(modifier = Modifier.padding(10.dp))
-            MyOutlinedTextFiled(
+            OutlinedTextField(
                 value = name,
-                onValuedChange = { name = it },
-                label = "Change name",
-                placeholder = name,
-
-                )
-            MyOutlinedTextFiled(
+                label = { Text(text = "Full name", fontFamily = rignteousFont, fontSize = 16.sp) },
+                placeholder = { Text(text = name, fontFamily = rignteousFont, fontSize = 16.sp) },
+                onValueChange = { name = it },
+                textStyle = TextStyle(fontFamily = rignteousFont, fontSize = 20.sp),
+                shape = RectangleShape,
+                maxLines = 1,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            OutlinedTextField(
                 value = phoneNumber,
-                onValuedChange = { phoneNumber = it },
-                label = "Phone number",
-                placeholder = phoneNumber
+                label = {
+                    Text(
+                        text = "Phone number",
+                        fontFamily = rignteousFont,
+                        fontSize = 16.sp
+                    )
+                },
+                placeholder = {
+                    Text(
+                        text = phoneNumber,
+                        fontFamily = rignteousFont,
+                        fontSize = 16.sp
+                    )
+                },
+                onValueChange = { value -> phoneNumber = value.filter { it.isDigit() } },
+                textStyle = TextStyle(fontFamily = rignteousFont, fontSize = 20.sp),
+                shape = RectangleShape,
+                maxLines = 1,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth(),
             )
             Spacer(modifier = Modifier.padding(10.dp))
             GenderSelection(sex = if (userInfo.sex) "Male" else "Female") { gender = it == "Male" }
@@ -179,17 +203,18 @@ fun ChangeInfoScreen(
                                 )
                                 UserApi.retrofitService.updateUser(user)
                                 userViewModel.user.value = user
-                                val imagePart = uriToMultipart(uri, context, username)
-                                AvatarImageApi.retrofitService.changeImage(imagePart, username)
-                                avatarImageViewModel.avatarImage!!.url = uri.toString()
-                                Toast.makeText(context, "Update success", Toast.LENGTH_SHORT).show()
+                                if (uri != null) {
+                                    val imagePart = uriToMultipart(uri, context, username)
+                                    AvatarImageApi.retrofitService.changeImage(imagePart, username)
+                                    avatarImageViewModel.avatarImage!!.url = uri.toString()
+                                }
+                                Toast.makeText(context, "Update success", Toast.LENGTH_SHORT)
+                                    .show()
                             } catch (e: Exception) {
                                 e.printStackTrace()
                                 Toast.makeText(context, "Update failed", Toast.LENGTH_SHORT).show()
                             }
                         }
-
-
                     },
                     modifier = Modifier
                         .align(Alignment.Bottom)
@@ -250,35 +275,6 @@ fun ChangeAvatar(placeholder: Int, onUriChange: (Uri?) -> Unit, avatarImageUrl: 
             Text(text = "Image size < 1MB", fontFamily = rignteousFont)
         }
     }
-}
-
-@Composable
-fun MyOutlinedTextFiled(
-    value: String,
-    onValuedChange: (String) -> Unit,
-    label: String = "",
-    placeholder: String = "",
-) {
-    OutlinedTextField(
-        value = value,
-        label = {
-            Text(
-                text = label, fontFamily = rignteousFont, fontSize = 16.sp
-            )
-        },
-        placeholder = {
-            Text(
-                text = placeholder, fontFamily = rignteousFont, fontSize = 16.sp
-            )
-        },
-        onValueChange = onValuedChange,
-        textStyle = TextStyle(
-            fontFamily = rignteousFont, fontSize = 20.sp
-        ),
-        shape = RectangleShape,
-        maxLines = 1,
-        modifier = Modifier.fillMaxWidth(),
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

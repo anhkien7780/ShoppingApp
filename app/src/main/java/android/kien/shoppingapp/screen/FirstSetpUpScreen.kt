@@ -23,11 +23,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,9 +41,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -95,17 +101,28 @@ fun FirstSetupScreen(
             ChangeAvatar(placeholder = R.drawable.default_logo, onUriChange = { uri = it }, "")
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
             Spacer(modifier = Modifier.padding(10.dp))
-            MyOutlinedTextFiled(
+            OutlinedTextField(
                 value = name,
-                onValuedChange = { name = it },
-                label = "Full name",
-                placeholder = name
+                label = { Text(text = "Full name", fontFamily = rignteousFont, fontSize = 16.sp) },
+                placeholder = { Text(text = name, fontFamily = rignteousFont, fontSize = 16.sp) },
+                onValueChange = { name = it },
+                textStyle = TextStyle(fontFamily = rignteousFont, fontSize = 20.sp),
+                shape = RectangleShape,
+                maxLines = 1,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
             )
-            MyOutlinedTextFiled(
+            OutlinedTextField(
                 value = phoneNumber,
-                onValuedChange = { phoneNumber = it },
-                label = "Phone number",
-                placeholder = phoneNumber
+                label = { Text(text = "Phone number", fontFamily = rignteousFont, fontSize = 16.sp) },
+                placeholder = { Text(text = phoneNumber, fontFamily = rignteousFont, fontSize = 16.sp) },
+                onValueChange = { value -> phoneNumber = value.filter { it.isDigit() } },
+                textStyle = TextStyle(fontFamily = rignteousFont, fontSize = 20.sp),
+                shape = RectangleShape,
+                maxLines = 1,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth(),
             )
             Spacer(modifier = Modifier.padding(10.dp))
             GenderSelection(sex = if (sex) "Male" else "Female") { sex = it == "Male" }
