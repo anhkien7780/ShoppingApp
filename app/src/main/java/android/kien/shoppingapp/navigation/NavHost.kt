@@ -1,7 +1,5 @@
 package android.kien.shoppingapp.navigation
 
-import android.kien.shoppingapp.data.allUserInfo
-import android.kien.shoppingapp.models.User
 import android.kien.shoppingapp.screen.AddressesScreen
 import android.kien.shoppingapp.screen.CartScreen
 import android.kien.shoppingapp.screen.ChangeInfoScreen
@@ -14,7 +12,6 @@ import android.kien.shoppingapp.screen.SignInScreen
 import android.kien.shoppingapp.screen.SignUpScreen
 import android.kien.shoppingapp.screen.UserInfoSettingScreen
 import android.kien.shoppingapp.viewmodel.AccountViewModel
-import android.kien.shoppingapp.viewmodel.AvatarImageUiState
 import android.kien.shoppingapp.viewmodel.AvatarImageViewModel
 import android.kien.shoppingapp.viewmodel.CartViewModel
 import android.kien.shoppingapp.viewmodel.ProductViewModel
@@ -67,7 +64,7 @@ fun MyAppNavHost(
         }
 
         composable(route = Screen.ListProductsScreen.route) {
-            if (userViewModel.userUiState == UserUiState.Loading || avatarImageViewModel.avatarImageUiState == AvatarImageUiState.Loading) {
+            if (userViewModel.userUiState == UserUiState.Loading) {
                 CircularProgressIndicator()
             } else{
                 ListProductScreen(

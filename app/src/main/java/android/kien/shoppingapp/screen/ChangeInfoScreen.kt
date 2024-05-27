@@ -6,11 +6,14 @@ import android.kien.shoppingapp.R
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.models.Date
 import android.kien.shoppingapp.models.User
+import android.kien.shoppingapp.network.AvatarImageApi
+import android.kien.shoppingapp.network.UserApi
 import android.kien.shoppingapp.ui.theme.ShoppingAppTheme
 import android.kien.shoppingapp.viewmodel.AvatarImageViewModel
 import android.kien.shoppingapp.viewmodel.UserViewModel
 import android.net.Uri
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -49,6 +52,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +66,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
@@ -79,6 +84,7 @@ fun ChangeInfoScreen(
     avatarImageViewModel: AvatarImageViewModel,
     onBack: () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     var name by remember {
         mutableStateOf(userInfo.name)
     }
@@ -98,7 +104,7 @@ fun ChangeInfoScreen(
         mutableStateOf(userInfo.phoneNumber)
     }
     var uri by remember {
-        mutableStateOf<Uri?>(Uri.parse(avatarImageViewModel.avatarImage!!.url))
+        mutableStateOf<Uri?>(null)
     }
     Scaffold(topBar = {
         CenterAlignedTopAppBar(title = {
@@ -120,7 +126,11 @@ fun ChangeInfoScreen(
             modifier = Modifier.padding(innerPadding)
         ) {
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
-            ChangeAvatar(placeholder = R.drawable.default_logo, onUriChange = { uri = it })
+            ChangeAvatar(
+                placeholder = R.drawable.default_logo,
+                onUriChange = { uri = it },
+                avatarImageUrl = avatarImageViewModel.avatarImage!!.url
+            )
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
             Spacer(modifier = Modifier.padding(10.dp))
             MyOutlinedTextFiled(
@@ -130,7 +140,12 @@ fun ChangeInfoScreen(
                 placeholder = name,
 
                 )
-
+            MyOutlinedTextFiled(
+                value = phoneNumber,
+                onValuedChange = { phoneNumber = it },
+                label = "Phone number",
+                placeholder = phoneNumber
+            )
             Spacer(modifier = Modifier.padding(10.dp))
             GenderSelection(sex = if (userInfo.sex) "Male" else "Female") { gender = it == "Male" }
             Spacer(modifier = Modifier.padding(10.dp))
@@ -152,21 +167,29 @@ fun ChangeInfoScreen(
             ) {
                 Button(
                     onClick = {
-                        userViewModel.updateUser(
-                            User(
-                                name = name,
-                                birthDay = birthday.format(DateTimeFormatter.ofPattern("d/M/yyyy")),
-                                sex = gender,
-                                age = LocalDateTime.now().year - birthday.year,
-                                phoneNumber = phoneNumber,
-                                username = username
-                            )
-                        )
-                        avatarImageViewModel.changeAvatarImage(
-                            uri = Uri.parse(uri.toString()),
-                            context = context,
-                            username = username
-                        )
+                        scope.launch {
+                            try {
+                                val user = User(
+                                    name = name,
+                                    birthDay = birthday.format(DateTimeFormatter.ofPattern("d/M/yyyy")),
+                                    sex = gender,
+                                    age = LocalDateTime.now().year - birthday.year,
+                                    phoneNumber = phoneNumber,
+                                    username = username
+                                )
+                                UserApi.retrofitService.updateUser(user)
+                                userViewModel.user.value = user
+                                val imagePart = uriToMultipart(uri, context, username)
+                                AvatarImageApi.retrofitService.changeImage(imagePart, username)
+                                avatarImageViewModel.avatarImage!!.url = uri.toString()
+                                Toast.makeText(context, "Update success", Toast.LENGTH_SHORT).show()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                Toast.makeText(context, "Update failed", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+
                     },
                     modifier = Modifier
                         .align(Alignment.Bottom)
@@ -181,7 +204,7 @@ fun ChangeInfoScreen(
 }
 
 @Composable
-fun ChangeAvatar(placeholder: Int, onUriChange: (Uri?) -> Unit) {
+fun ChangeAvatar(placeholder: Int, onUriChange: (Uri?) -> Unit, avatarImageUrl: String) {
     var uri by remember {
         mutableStateOf<Uri?>(null)
     }
@@ -199,7 +222,7 @@ fun ChangeAvatar(placeholder: Int, onUriChange: (Uri?) -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AsyncImage(
-            model = uri,
+            model = uri ?: avatarImageUrl,
             contentDescription = "Avatar",
             contentScale = ContentScale.Crop,
             placeholder = painterResource(id = placeholder),
@@ -308,10 +331,10 @@ fun GenderSelection(
     sex: String, onGenderChange: (String) -> Unit
 ) {
     var maleGenderChecked by remember {
-        mutableStateOf(false)
+        mutableStateOf(sex == "Male")
     }
     var femaleGenderChecked by remember {
-        mutableStateOf(false)
+        mutableStateOf(sex == "Female")
     }
 
     Column(modifier = Modifier.fillMaxWidth()) {

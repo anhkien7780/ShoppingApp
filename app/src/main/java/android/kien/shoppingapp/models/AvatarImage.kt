@@ -3,4 +3,4 @@ package android.kien.shoppingapp.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AvatarImage(val url: String, val username: String)
+data class AvatarImage(var url: String, val username: String)

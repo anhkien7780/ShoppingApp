@@ -92,7 +92,7 @@ fun FirstSetupScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
-            ChangeAvatar(placeholder = R.drawable.default_logo, onUriChange = { uri = it })
+            ChangeAvatar(placeholder = R.drawable.default_logo, onUriChange = { uri = it }, "")
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
             Spacer(modifier = Modifier.padding(10.dp))
             MyOutlinedTextFiled(
@@ -129,32 +129,17 @@ fun FirstSetupScreen(
                     onClick = {
                         scope.launch {
                             try {
-
-
                                 val user = User(
-                                    name,
-                                    birthDay.format(DateTimeFormatter.ofPattern("d/MM/yyyy")),
-                                    LocalDate.now().year - birthDay.year,
-                                    sex,
-                                    phoneNumber,
-                                    username
+                                    name = name,
+                                    birthDay = birthDay.format(DateTimeFormatter.ofPattern("d/MM/yyyy")),
+                                    age = LocalDate.now().year - birthDay.year,
+                                    sex = sex,
+                                    phoneNumber = phoneNumber,
+                                    username = username
                                 )
                                 userViewModel.user.value = user
                                 UserApi.retrofitService.addNewUser(user)
-                                val contentResolver: ContentResolver = context.contentResolver
-                                val inputStream: InputStream? = uri?.let { it ->
-                                    contentResolver.openInputStream(it)
-                                }
-                                val byteArrayOutputStream = ByteArrayOutputStream()
-                                inputStream?.copyTo(byteArrayOutputStream)
-                                val byteArray = byteArrayOutputStream.toByteArray()
-                                val imageMediaType = "image/png".toMediaType()
-                                val imageRequestBody = byteArray.toRequestBody(imageMediaType)
-                                val imagePart = MultipartBody.Part.createFormData(
-                                    "image",
-                                    "${username}_avatar.png",
-                                    imageRequestBody
-                                )
+                                val imagePart = uriToMultipart(uri, context, username)
                                 AvatarImageApi.retrofitService.addImage(imagePart, username)
                                 avatarImageViewModel.avatarImage =
                                     AvatarImage(uri.toString(), username)
@@ -191,4 +176,22 @@ fun FirstSetupScreenPreview() {
         avatarImageViewModel = AvatarImageViewModel(),
         onAddUserInfo = {}
     )
+}
+
+fun uriToMultipart(uri: Uri?, context: Context, username: String): MultipartBody.Part {
+    val contentResolver: ContentResolver = context.contentResolver
+    val inputStream: InputStream? = uri?.let { it ->
+        contentResolver.openInputStream(it)
+    }
+    val byteArrayOutputStream = ByteArrayOutputStream()
+    inputStream?.copyTo(byteArrayOutputStream)
+    val byteArray = byteArrayOutputStream.toByteArray()
+    val imageMediaType = "image/png".toMediaType()
+    val imageRequestBody = byteArray.toRequestBody(imageMediaType)
+    val imagePart = MultipartBody.Part.createFormData(
+        "image",
+        "${username}_avatar.png",
+        imageRequestBody
+    )
+    return imagePart
 }
