@@ -130,9 +130,7 @@ fun MyAppNavHost(
             AddressesScreen(onBack = { navController.popBackStack() })
         }
         composable(route = Screen.ChangePasswordScreen.route) {
-            ChangePasswordScreen(
-                onBack = { navController.popBackStack() },
-                onSave = { navController.popBackStack() })
+            ChangePasswordScreen(onBack = { navController.popBackStack() })
         }
         composable(route = Screen.ChangeUserInfoScreen.route) {
             ChangeInfoScreen(

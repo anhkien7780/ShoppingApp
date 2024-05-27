@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -29,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,7 +38,7 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ChangePasswordScreen(onBack: () -> Unit, onSave: () -> Unit) {
+fun ChangePasswordScreen(onBack: () -> Unit) {
     var oldPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -66,7 +68,8 @@ fun ChangePasswordScreen(onBack: () -> Unit, onSave: () -> Unit) {
                 placeholder = { Text(text = "Enter password") },
                 singleLine = true,
                 maxLines = 1,
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
             Spacer(modifier = Modifier.padding(10.dp))
             OutlinedTextField(
@@ -77,7 +80,8 @@ fun ChangePasswordScreen(onBack: () -> Unit, onSave: () -> Unit) {
                 placeholder = { Text(text = "Enter password") },
                 singleLine = true,
                 maxLines = 1,
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
             Spacer(modifier = Modifier.padding(10.dp))
             OutlinedTextField(
@@ -88,7 +92,8 @@ fun ChangePasswordScreen(onBack: () -> Unit, onSave: () -> Unit) {
                 placeholder = { Text(text = "Enter password") },
                 singleLine = true,
                 maxLines = 1,
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
             Row(
                 modifier = Modifier
@@ -99,7 +104,7 @@ fun ChangePasswordScreen(onBack: () -> Unit, onSave: () -> Unit) {
             ) {
                 Button(
                     onClick = {
-                        onSave()
+
                     },
                     modifier = Modifier.fillMaxWidth(0.9f),
                     colors = ButtonDefaults.buttonColors(Color(218, 128, 128))
@@ -116,6 +121,6 @@ fun ChangePasswordScreen(onBack: () -> Unit, onSave: () -> Unit) {
 @Composable
 fun ChangePasswordScreenPreview() {
     ShoppingAppTheme {
-        ChangePasswordScreen({},{})
+        ChangePasswordScreen({})
     }
 }
