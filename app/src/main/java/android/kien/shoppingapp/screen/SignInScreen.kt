@@ -33,12 +33,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -67,16 +69,17 @@ fun SignInScreen(
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text(text = "Email") },
-                    placeholder = { Text(text = "Email") },
+                    label = { Text(text = "Email", fontFamily = rignteousFont, fontSize = 16.sp) },
+                    placeholder = { Text(text = "Email", fontFamily = rignteousFont, fontSize = 16.sp) },
+                    textStyle = TextStyle(fontFamily = rignteousFont, fontSize = 20.sp),
                     singleLine = true,
                     maxLines = 1
                 )
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text(text = "Password") },
-                    placeholder = { Text(text = "Password") },
+                    label = { Text(text = "Password", fontFamily = rignteousFont, fontSize = 16.sp) },
+                    placeholder = { Text(text = "Password", fontFamily = rignteousFont, fontSize = 16.sp) },
                     singleLine = true,
                     maxLines = 1,
                     visualTransformation = PasswordVisualTransformation(),
@@ -91,7 +94,9 @@ fun SignInScreen(
                     onCheckedChange = { rememberState = it },
                 )
                 Text(
-                    text = "Remember me"
+                    text = "Remember me",
+                    fontFamily = rignteousFont,
+                    fontWeight = FontWeight.Normal
                 )
             }
         }

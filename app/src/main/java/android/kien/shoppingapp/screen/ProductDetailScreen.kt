@@ -54,17 +54,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.example.models.Product
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "CoroutineCreationDuringComposition")
 @Composable
 fun ProductDetailsScreen(
     context: Context,
-    productID: Int,
+    item: Int,
     navController: NavHostController,
     productViewModel: ProductViewModel,
     cartViewModel: CartViewModel,
@@ -72,13 +68,7 @@ fun ProductDetailsScreen(
 ) {
     val scrollableState = rememberScrollState()
     val product =
-        productViewModel.productList.value?.get(productID) ?: Product(
-            1,
-            "Product 1",
-            1.0f,
-            "",
-            ""
-        )
+        productViewModel.productList.value!![item]
     var searchQuery by remember {
         mutableStateOf("")
     }
@@ -186,7 +176,7 @@ fun ProductDetailsScreen(
             Row(modifier = Modifier.fillMaxHeight()) {
                 Button(
                     onClick = {
-                        cartViewModel.addToCart(cartViewModel.cartID, productID)
+                        cartViewModel.addToCart(cartViewModel.cartID, product.productID)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -232,7 +222,7 @@ fun ProductDetailsScreen(
 fun ProductDetailsScreenPreview() {
     ProductDetailsScreen(
         context = LocalContext.current,
-        productID = 0,
+        item = 0,
         navController = NavHostController(LocalContext.current),
         productViewModel = viewModel(modelClass = ProductViewModel::class.java),
         cartViewModel = viewModel(modelClass = CartViewModel::class.java),

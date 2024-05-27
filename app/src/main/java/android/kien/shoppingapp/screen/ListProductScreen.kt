@@ -100,7 +100,6 @@ fun ListProductScreen(
                     .align(Alignment.CenterHorizontally)
                     .fillMaxHeight(0.95f)
             ) {
-
                 IconButton(
                     onClick = onLogout,
                     modifier = Modifier
@@ -216,12 +215,18 @@ fun ProductCard(product: Product, onClick: () -> Unit) {
                 Text(
                     text = product.productName,
                     Modifier.fillMaxWidth(),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = robotoMonoFont,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
             }
             Text(
                 text = "$" + product.price.toString(),
+                fontWeight = FontWeight.Bold,
+                fontFamily = robotoMonoFont,
+                fontSize = 16.sp
             )
 
         }

@@ -19,19 +19,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -65,16 +64,17 @@ fun SignUpScreen(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text(text = "Email") },
-                placeholder = { Text(text = "Email") },
+                label = { Text(text = "Email", fontFamily = rignteousFont, fontSize = 16.sp) },
+                placeholder = { Text(text = "Email", fontFamily = rignteousFont, fontSize = 16.sp) },
+                textStyle = TextStyle(fontFamily = rignteousFont, fontSize = 20.sp),
                 singleLine = true,
                 maxLines = 1
             )
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text(text = "Password") },
-                placeholder = { Text(text = "Password") },
+                label = { Text(text = "Password", fontFamily = rignteousFont, fontSize = 16.sp) },
+                placeholder = { Text(text = "Password", fontFamily = rignteousFont, fontSize = 16.sp) },
                 singleLine = true,
                 maxLines = 1,
                 visualTransformation = PasswordVisualTransformation(),
@@ -83,8 +83,9 @@ fun SignUpScreen(
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it },
-                label = { Text(text = "Confirm Password") },
-                placeholder = { Text(text = "Enter your password again") },
+                label = { Text(text = "Confirm Password", fontFamily = rignteousFont, fontSize = 16.sp) },
+                placeholder = { Text(text = "Enter your password again", fontFamily = rignteousFont, fontSize = 16.sp) },
+                textStyle = TextStyle(fontFamily = rignteousFont, fontSize = 20.sp),
                 singleLine = true,
                 maxLines = 1,
                 visualTransformation = PasswordVisualTransformation(),

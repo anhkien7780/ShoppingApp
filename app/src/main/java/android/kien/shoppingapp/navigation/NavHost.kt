@@ -6,6 +6,7 @@ import android.kien.shoppingapp.screen.ChangeInfoScreen
 import android.kien.shoppingapp.screen.ChangePasswordScreen
 import android.kien.shoppingapp.screen.FirstSetupScreen
 import android.kien.shoppingapp.screen.ListProductScreen
+import android.kien.shoppingapp.screen.PaymentScreen
 import android.kien.shoppingapp.screen.PaymentSuccessScreen
 import android.kien.shoppingapp.screen.ProductDetailsScreen
 import android.kien.shoppingapp.screen.SignInScreen
@@ -19,8 +20,11 @@ import android.kien.shoppingapp.viewmodel.UserUiState
 import android.kien.shoppingapp.viewmodel.UserViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -65,8 +69,10 @@ fun MyAppNavHost(
 
         composable(route = Screen.ListProductsScreen.route) {
             if (userViewModel.userUiState == UserUiState.Loading) {
-                CircularProgressIndicator()
-            } else{
+                Column(Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(modifier = Modifier.fillMaxSize())
+                }
+            } else {
                 ListProductScreen(
                     navController = navController,
                     productViewModel = productViewModel,
@@ -88,16 +94,16 @@ fun MyAppNavHost(
                 cartViewModel = cartViewModel,
                 productViewModel = productViewModel,
                 onBackClick = { navController.popBackStack() },
-                onPaymentSuccess = { navController.navigate(Screen.PaymentSuccessScreen.route) }
+                onPayment = { navController.navigate(Screen.PaymentScreen.route) }
             )
         }
 
-        composable(route = Screen.ProductDetailScreen.route + "/{productID}") {
-            val productID = it.arguments?.getString("productID")
-            if (productID != null) {
+        composable(route = Screen.ProductDetailScreen.route + "/{item}") {
+            val item = it.arguments?.getString("item")
+            if (item != null) {
                 ProductDetailsScreen(
                     context = LocalContext.current,
-                    productID = productID.toInt(),
+                    item = item.toInt(),
                     productViewModel = productViewModel,
                     cartViewModel = cartViewModel,
                     navController = navController,
@@ -130,7 +136,10 @@ fun MyAppNavHost(
             AddressesScreen(onBack = { navController.popBackStack() })
         }
         composable(route = Screen.ChangePasswordScreen.route) {
-            ChangePasswordScreen(onBack = { navController.popBackStack() })
+            ChangePasswordScreen(
+                onBack = { navController.popBackStack() },
+                username = accountViewModel.username
+            )
         }
         composable(route = Screen.ChangeUserInfoScreen.route) {
             ChangeInfoScreen(
@@ -139,12 +148,18 @@ fun MyAppNavHost(
                 context = LocalContext.current,
                 userViewModel = userViewModel,
                 avatarImageViewModel = avatarImageViewModel,
-                onBack = {navController.popBackStack()}
+                onBack = { navController.popBackStack() }
             )
         }
         composable(route = Screen.PaymentSuccessScreen.route) {
             PaymentSuccessScreen(onBackToHome = { navController.navigate(Screen.ListProductsScreen.route) })
         }
 
+        composable(route = Screen.PaymentScreen.route) {
+            PaymentScreen(
+                cartViewModel = cartViewModel,
+                productViewModel = productViewModel,
+                onBack = { navController.popBackStack() })
+        }
     }
 }
