@@ -12,6 +12,9 @@ interface AvatarImageApiService{
     @Multipart
     @POST("/avatar/add/{username}")
     suspend fun addImage(@Part image: MultipartBody.Part, @Path("username") username: String)
+    @Multipart
+    @POST("avatar/change/{username}")
+    suspend fun changeImage(@Part image: MultipartBody.Part, @Path("username") username: String)
     @GET("avatar/get/{username}")
     suspend fun getAvatar(@Path("username") username: String): AvatarImage
 }

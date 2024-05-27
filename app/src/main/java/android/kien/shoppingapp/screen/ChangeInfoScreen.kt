@@ -1,11 +1,14 @@
 package android.kien.shoppingapp.screen
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.kien.shoppingapp.R
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.models.Date
 import android.kien.shoppingapp.models.User
 import android.kien.shoppingapp.ui.theme.ShoppingAppTheme
+import android.kien.shoppingapp.viewmodel.AvatarImageViewModel
+import android.kien.shoppingapp.viewmodel.UserViewModel
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -60,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
 
@@ -69,7 +73,10 @@ import java.util.Calendar
 @Composable
 fun ChangeInfoScreen(
     userInfo: User,
-    onSave: () -> Unit,
+    username: String,
+    context: Context,
+    userViewModel: UserViewModel,
+    avatarImageViewModel: AvatarImageViewModel,
     onBack: () -> Unit
 ) {
     var name by remember {
@@ -79,10 +86,19 @@ fun ChangeInfoScreen(
         mutableStateOf(userInfo.sex)
     }
     var birthday by remember {
-        mutableStateOf(userInfo.getBirthDay())
+        mutableStateOf(
+            Date(
+                userInfo.getBirthDay().dayOfMonth,
+                userInfo.getBirthDay().monthValue,
+                userInfo.getBirthDay().year
+            ).toLocalDate()
+        )
+    }
+    var phoneNumber: String by remember {
+        mutableStateOf(userInfo.phoneNumber)
     }
     var uri by remember {
-        mutableStateOf<Uri?>(null)
+        mutableStateOf<Uri?>(Uri.parse(avatarImageViewModel.avatarImage!!.url))
     }
     Scaffold(topBar = {
         CenterAlignedTopAppBar(title = {
@@ -91,7 +107,7 @@ fun ChangeInfoScreen(
                 fontFamily = rignteousFont
             )
         }, navigationIcon = {
-            IconButton(onClick = { onBack()}) {
+            IconButton(onClick = { onBack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back Button"
@@ -104,7 +120,7 @@ fun ChangeInfoScreen(
             modifier = Modifier.padding(innerPadding)
         ) {
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
-            ChangeAvatar(placeholder = R.drawable.default_logo, onUriChange = {uri = it})
+            ChangeAvatar(placeholder = R.drawable.default_logo, onUriChange = { uri = it })
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
             Spacer(modifier = Modifier.padding(10.dp))
             MyOutlinedTextFiled(
@@ -113,16 +129,18 @@ fun ChangeInfoScreen(
                 label = "Change name",
                 placeholder = name,
 
-            )
+                )
 
             Spacer(modifier = Modifier.padding(10.dp))
-            GenderSelection(sex = if(userInfo.sex) "Male" else "Female"  ) { gender = it == "Male" }
+            GenderSelection(sex = if (userInfo.sex) "Male" else "Female") { gender = it == "Male" }
             Spacer(modifier = Modifier.padding(10.dp))
-            BirthdaySelection(birthday = Date(
-                birthday.dayOfMonth,
-                birthday.monthValue,
-                birthday.year
-            )) {
+            BirthdaySelection(
+                birthday = Date(
+                    birthday.dayOfMonth,
+                    birthday.monthValue,
+                    birthday.year
+                )
+            ) {
                 birthday = it.toLocalDate()
             }
 
@@ -134,7 +152,21 @@ fun ChangeInfoScreen(
             ) {
                 Button(
                     onClick = {
-                              onSave()
+                        userViewModel.updateUser(
+                            User(
+                                name = name,
+                                birthDay = birthday.format(DateTimeFormatter.ofPattern("d/M/yyyy")),
+                                sex = gender,
+                                age = LocalDateTime.now().year - birthday.year,
+                                phoneNumber = phoneNumber,
+                                username = username
+                            )
+                        )
+                        avatarImageViewModel.changeAvatarImage(
+                            uri = Uri.parse(uri.toString()),
+                            context = context,
+                            username = username
+                        )
                     },
                     modifier = Modifier
                         .align(Alignment.Bottom)
@@ -377,10 +409,6 @@ fun BirthdaySelection(birthday: Date, onBirthDayChange: (Date) -> Unit) {
         }
     }
 }
-
-
-
-
 
 
 @Preview(showBackground = true)

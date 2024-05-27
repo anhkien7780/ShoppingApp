@@ -138,16 +138,14 @@ fun MyAppNavHost(
                 onSave = { navController.popBackStack() })
         }
         composable(route = Screen.ChangeUserInfoScreen.route) {
-            ChangeInfoScreen(userInfo = User(
-                "Nguyen Van Kien",
-                "27/10/2002",
-                27,
-                true,
-                "077365132",
-                "anhkien7780@gmail.com"
-            ),
-                { navController.popBackStack() },
-                onBack = { navController.popBackStack() })
+            ChangeInfoScreen(
+                userInfo = userViewModel.user.value!!,
+                username = accountViewModel.username,
+                context = LocalContext.current,
+                userViewModel = userViewModel,
+                avatarImageViewModel = avatarImageViewModel,
+                onBack = {navController.popBackStack()}
+            )
         }
         composable(route = Screen.PaymentSuccessScreen.route) {
             PaymentSuccessScreen(onBackToHome = { navController.navigate(Screen.ListProductsScreen.route) })

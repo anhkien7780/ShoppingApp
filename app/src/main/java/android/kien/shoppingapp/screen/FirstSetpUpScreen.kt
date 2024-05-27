@@ -6,6 +6,7 @@ import android.kien.shoppingapp.R
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.models.Date
 import android.kien.shoppingapp.models.User
+import android.kien.shoppingapp.network.UserApi
 import android.kien.shoppingapp.viewmodel.AvatarImageUiState
 import android.kien.shoppingapp.viewmodel.AvatarImageViewModel
 import android.kien.shoppingapp.viewmodel.CartViewModel
@@ -34,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -56,6 +59,7 @@ fun FirstSetupScreen(
     avatarImageViewModel: AvatarImageViewModel,
     onAddUserInfo: () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     var name by remember {
         mutableStateOf("")
     }
@@ -84,7 +88,7 @@ fun FirstSetupScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
-            ChangeAvatar(placeholder = R.drawable.default_logo, onUriChange = {uri = it})
+            ChangeAvatar(placeholder = R.drawable.default_logo, onUriChange = { uri = it })
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
             Spacer(modifier = Modifier.padding(10.dp))
             MyOutlinedTextFiled(
@@ -111,22 +115,6 @@ fun FirstSetupScreen(
             ) {
                 birthDay = it.toLocalDate()
             }
-            when(userViewModel.userUiState){
-                is UserUiState.Loading -> {
-                    CircularProgressIndicator()
-                }
-                is UserUiState.Success -> {
-                    avatarImageViewModel.uploadAvatarImage(uri, context, username)
-                    userViewModel.getUser(username)
-                    userViewModel.setUserUiStateToIdle()
-                    onAddUserInfo()
-                }
-                is UserUiState.Error -> {
-                    Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
-                }
-                is UserUiState.Idle -> {}
-            }
-
             Row(
                 modifier = Modifier
                     .fillMaxHeight(0.95f)
@@ -135,16 +123,19 @@ fun FirstSetupScreen(
             ) {
                 Button(
                     onClick = {
-                        userViewModel.addUser(
-                            User(
-                                name,
-                                birthDay.format(DateTimeFormatter.ofPattern("d/MM/yyyy")),
-                                LocalDate.now().year - birthDay.year,
-                                sex,
-                                phoneNumber,
-                                username
+                        scope.launch {
+                            UserApi.retrofitService.addNewUser(
+                                User(
+                                    name,
+                                    birthDay.format(DateTimeFormatter.ofPattern("d/MM/yyyy")),
+                                    LocalDate.now().year - birthDay.year,
+                                    sex,
+                                    phoneNumber,
+                                    username
+                                )
                             )
-                        )
+                        }
+
                     },
                     modifier = Modifier
                         .align(Alignment.Bottom)

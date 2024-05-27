@@ -30,24 +30,37 @@ class UserViewModel : ViewModel() {
                 UserApi.retrofitService.addNewUser(user)
                 this@UserViewModel.user.value = user
                 userUiState = UserUiState.Success
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 userUiState = UserUiState.Error
                 println(e.message)
             }
         }
     }
 
-    fun setUserUiStateToIdle(){
+    fun setUserUiStateToIdle() {
         userUiState = UserUiState.Idle
     }
 
-    fun getUser(username: String){
+    fun getUser(username: String) {
         viewModelScope.launch {
             try {
                 userUiState = UserUiState.Loading
                 user.value = UserApi.retrofitService.getUser(username)
                 userUiState = UserUiState.Success
-            } catch (e: Exception){
+            } catch (e: Exception) {
+                userUiState = UserUiState.Error
+                println(e.message)
+            }
+        }
+    }
+
+    fun updateUser(user: User) {
+        viewModelScope.launch {
+            try {
+                UserApi.retrofitService.updateUser(user)
+                this@UserViewModel.user.value = user
+                userUiState = UserUiState.Success
+            } catch (e: Exception) {
                 userUiState = UserUiState.Error
                 println(e.message)
             }

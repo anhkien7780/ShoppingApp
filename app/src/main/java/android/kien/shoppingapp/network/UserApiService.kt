@@ -12,6 +12,8 @@ interface UserApiService{
 
     @POST("/users/add")
     suspend fun addNewUser(@Body user: User)
+    @POST("/users/change")
+    suspend fun updateUser(@Body user: User)
 }
 
 object UserApi{
