@@ -158,6 +158,7 @@ fun MyAppNavHost(
         composable(route = Screen.PaymentScreen.route) {
             PaymentScreen(
                 cartViewModel = cartViewModel,
+                userViewModel = userViewModel,
                 productViewModel = productViewModel,
                 onBack = { navController.popBackStack() })
         }

@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.models.Product
+import java.math.BigDecimal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState")
@@ -69,7 +70,7 @@ fun CartScreen(
     Scaffold(topBar = {
         CenterAlignedTopAppBar(title = {
             Text(
-                text = "Shop Cart", fontFamily = rignteousFont
+                text = "CART", fontFamily = rignteousFont
             )
         }, navigationIcon = {
             IconButton(onClick = { onBackClick() }) {
@@ -136,7 +137,7 @@ fun CartScreen(
                             }
                             item {
                                 Text(
-                                    "Estimated subTotal: ${subTotal.value}",
+                                    "Estimated subTotal: $${BigDecimal(subTotal.value.toString())}",
                                     Modifier.padding(top = 10.dp, start = 5.dp),
                                     fontWeight = FontWeight.Bold,
                                     fontFamily = robotoMonoFont,
