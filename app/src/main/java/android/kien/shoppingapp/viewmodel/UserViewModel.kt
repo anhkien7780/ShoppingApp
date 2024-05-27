@@ -23,6 +23,7 @@ class UserViewModel : ViewModel() {
     var userUiState: UserUiState by mutableStateOf(UserUiState.Idle)
         private set
     var user = MutableLiveData<User>()
+
     fun addUser(user: User) {
         viewModelScope.launch {
             try {

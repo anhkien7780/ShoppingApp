@@ -26,39 +26,8 @@ sealed class AvatarImageUiState {
 
 class AvatarImageViewModel : ViewModel() {
     var avatarImage by mutableStateOf<AvatarImage?>(null)
-        private set
     var avatarImageUiState: AvatarImageUiState by mutableStateOf(AvatarImageUiState.Idle)
         private set
-
-    fun uploadAvatarImage(uri: Uri?, context: Context, username: String) {
-        viewModelScope.launch {
-            try {
-                avatarImageUiState = AvatarImageUiState.Loading
-                val contentResolver: ContentResolver = context.contentResolver
-                val inputStream: InputStream? = uri?.let { it ->
-                    contentResolver.openInputStream(it)
-                }
-                val byteArrayOutputStream = ByteArrayOutputStream()
-                inputStream?.copyTo(byteArrayOutputStream)
-                val byteArray = byteArrayOutputStream.toByteArray()
-                val imageMediaType = "image/png".toMediaType()
-                val imageRequestBody = byteArray.toRequestBody(imageMediaType)
-                val imagePart = MultipartBody.Part.createFormData(
-                    "image",
-                    "${username}_avatar.png",
-                    imageRequestBody
-                )
-                AvatarImageApi.retrofitService.addImage(imagePart, username)
-                avatarImage = AvatarImage(uri.toString(), username)
-                avatarImageUiState = AvatarImageUiState.Success
-            } catch (e: Exception) {
-                avatarImageUiState = AvatarImageUiState.Error
-                e.printStackTrace()
-            } finally {
-                avatarImageUiState = AvatarImageUiState.Idle
-            }
-        }
-    }
 
     fun getAvatarImage(username: String) {
         viewModelScope.launch {

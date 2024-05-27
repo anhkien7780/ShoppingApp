@@ -1,16 +1,16 @@
 package android.kien.shoppingapp.screen
 
 import android.annotation.SuppressLint
+import android.content.ContentResolver
 import android.content.Context
 import android.kien.shoppingapp.R
 import android.kien.shoppingapp.library.composable.rignteousFont
+import android.kien.shoppingapp.models.AvatarImage
 import android.kien.shoppingapp.models.Date
 import android.kien.shoppingapp.models.User
+import android.kien.shoppingapp.network.AvatarImageApi
 import android.kien.shoppingapp.network.UserApi
-import android.kien.shoppingapp.viewmodel.AvatarImageUiState
 import android.kien.shoppingapp.viewmodel.AvatarImageViewModel
-import android.kien.shoppingapp.viewmodel.CartViewModel
-import android.kien.shoppingapp.viewmodel.UserUiState
 import android.kien.shoppingapp.viewmodel.UserViewModel
 import android.net.Uri
 import android.os.Build
@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
@@ -44,6 +43,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -124,8 +128,10 @@ fun FirstSetupScreen(
                 Button(
                     onClick = {
                         scope.launch {
-                            UserApi.retrofitService.addNewUser(
-                                User(
+                            try {
+
+
+                                val user = User(
                                     name,
                                     birthDay.format(DateTimeFormatter.ofPattern("d/MM/yyyy")),
                                     LocalDate.now().year - birthDay.year,
@@ -133,7 +139,31 @@ fun FirstSetupScreen(
                                     phoneNumber,
                                     username
                                 )
-                            )
+                                userViewModel.user.value = user
+                                UserApi.retrofitService.addNewUser(user)
+                                val contentResolver: ContentResolver = context.contentResolver
+                                val inputStream: InputStream? = uri?.let { it ->
+                                    contentResolver.openInputStream(it)
+                                }
+                                val byteArrayOutputStream = ByteArrayOutputStream()
+                                inputStream?.copyTo(byteArrayOutputStream)
+                                val byteArray = byteArrayOutputStream.toByteArray()
+                                val imageMediaType = "image/png".toMediaType()
+                                val imageRequestBody = byteArray.toRequestBody(imageMediaType)
+                                val imagePart = MultipartBody.Part.createFormData(
+                                    "image",
+                                    "${username}_avatar.png",
+                                    imageRequestBody
+                                )
+                                AvatarImageApi.retrofitService.addImage(imagePart, username)
+                                avatarImageViewModel.avatarImage =
+                                    AvatarImage(uri.toString(), username)
+                                Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
+                                onAddUserInfo()
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Save failed", Toast.LENGTH_SHORT).show()
+                                e.printStackTrace()
+                            }
                         }
 
                     },
