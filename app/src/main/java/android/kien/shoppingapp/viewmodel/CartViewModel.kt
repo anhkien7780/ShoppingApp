@@ -118,4 +118,7 @@ class CartViewModel : ViewModel() {
             }
         }
     }
+    fun clearCart(){
+        _listCartItems.value = emptyList()
+    }
 }

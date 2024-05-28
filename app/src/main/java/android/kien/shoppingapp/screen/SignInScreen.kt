@@ -11,6 +11,7 @@ import android.kien.shoppingapp.viewmodel.CartViewModel
 import android.kien.shoppingapp.viewmodel.LoginUiState
 import android.kien.shoppingapp.viewmodel.UserViewModel
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -70,7 +71,13 @@ fun SignInScreen(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text(text = "Email", fontFamily = rignteousFont, fontSize = 16.sp) },
-                    placeholder = { Text(text = "Email", fontFamily = rignteousFont, fontSize = 16.sp) },
+                    placeholder = {
+                        Text(
+                            text = "Email",
+                            fontFamily = rignteousFont,
+                            fontSize = 16.sp
+                        )
+                    },
                     textStyle = TextStyle(fontFamily = rignteousFont, fontSize = 20.sp),
                     singleLine = true,
                     maxLines = 1
@@ -78,8 +85,20 @@ fun SignInScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text(text = "Password", fontFamily = rignteousFont, fontSize = 16.sp) },
-                    placeholder = { Text(text = "Password", fontFamily = rignteousFont, fontSize = 16.sp) },
+                    label = {
+                        Text(
+                            text = "Password",
+                            fontFamily = rignteousFont,
+                            fontSize = 16.sp
+                        )
+                    },
+                    placeholder = {
+                        Text(
+                            text = "Password",
+                            fontFamily = rignteousFont,
+                            fontSize = 16.sp
+                        )
+                    },
                     singleLine = true,
                     maxLines = 1,
                     visualTransformation = PasswordVisualTransformation(),
@@ -102,14 +121,22 @@ fun SignInScreen(
         }
         when (loginUiState) {
             is LoginUiState.Idle -> {}
-            is LoginUiState.Loading -> {CircularProgressIndicator()}
+            is LoginUiState.Loading -> {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator()
+                }
+            }
+
             is LoginUiState.Success -> {
                 onSuccessfulSignIn()
                 avatarImageViewModel.getAvatarImage(accountViewModel.username)
                 userViewModel.getUser(accountViewModel.username)
                 cartViewModel.getCart(accountViewModel.username)
             }
-            is LoginUiState.Error -> {wrongPassword = true}
+
+            is LoginUiState.Error -> {
+                wrongPassword = true
+            }
         }
         Spacer(modifier = Modifier.padding(top = 20.dp))
         Button(

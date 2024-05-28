@@ -4,10 +4,15 @@ import android.annotation.SuppressLint
 import android.kien.shoppingapp.R
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.library.composable.robotoMonoFont
+import android.kien.shoppingapp.models.Invoice
+import android.kien.shoppingapp.network.CartApi
 import android.kien.shoppingapp.viewmodel.CartViewModel
+import android.kien.shoppingapp.viewmodel.InvoiceUiState
+import android.kien.shoppingapp.viewmodel.InvoiceViewModel
 import android.kien.shoppingapp.viewmodel.ProductViewModel
 import android.kien.shoppingapp.viewmodel.UserViewModel
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +32,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -45,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -53,6 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import kotlinx.coroutines.runBlocking
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -61,22 +69,26 @@ import java.time.LocalDate
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentScreen(
+    username: String,
     cartViewModel: CartViewModel,
+    invoiceViewModel: InvoiceViewModel,
     userViewModel: UserViewModel,
     productViewModel: ProductViewModel,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onNavToPaymentSuccessScreen: () -> Unit
 ) {
+    val context = LocalContext.current
     val listCartItems = cartViewModel.listCartItems.collectAsState()
     var address by remember { mutableStateOf("") }
     val subTotal = derivedStateOf {
-        var total = 0.0f
+        var total = BigDecimal(0.0.toString())
         listCartItems.value.forEach { cartItem ->
             val product = productViewModel.productList.value!![cartItem.productID - 1]
-            total += product.price * cartItem.quantity
+            total += BigDecimal(product.price.toString()) * BigDecimal(cartItem.quantity.toString())
         }
         total
     }
-    val shippingFee = 0.8f
+    val shippingFee = BigDecimal(0.8f.toString())
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -100,7 +112,7 @@ fun PaymentScreen(
         ) {
             HorizontalDivider(thickness = 2.dp, color = Color.Black)
             Spacer(modifier = Modifier.height(15.dp))
-            Box (Modifier.weight(1f)){
+            Box(Modifier.weight(1f)) {
                 LazyColumn {
                     items(listCartItems.value.size) { item ->
                         val productID = listCartItems.value[item].productID
@@ -125,34 +137,84 @@ fun PaymentScreen(
                         Spacer(modifier = Modifier.height(15.dp))
                         DeliveryDateRow()
                         Spacer(modifier = Modifier.height(15.dp))
-                        PaymentDetailRow(subTotal.value, shippingFee)
+                        PaymentDetailRow(subTotal.value.toFloat(), shippingFee.toFloat())
                     }
                 }
             }
-            Row (Modifier.fillMaxWidth()){
-                Box(modifier = Modifier.align(Alignment.Bottom)) {
-                    Button(
-                        onClick = { },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 10.dp)
-                            .size(50.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(220, 170, 170)
-                        )
-                    ) {
-                        val subTotalBigNum = BigDecimal(subTotal.value.toString())
-                        val shippingFeeBigNum = BigDecimal(shippingFee.toString())
-                        val totalBigNum = subTotalBigNum.add(shippingFeeBigNum)
-                        Text(
-                            text = "$$totalBigNum",
-                            fontSize = 20.sp,
-                            fontFamily = robotoMonoFont,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
+            Row(Modifier.fillMaxWidth()) {
+                when (invoiceViewModel.invoiceUiState) {
+                    is InvoiceUiState.Idle -> {
+                        Box(modifier = Modifier.align(Alignment.Bottom)) {
+                            Button(
+                                onClick = {
+                                    if (address.isEmpty()) {
+                                        Toast.makeText(
+                                            context,
+                                            "Please enter your delivery address",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        invoiceViewModel.addInvoice(
+                                            Invoice(
+                                                subTotal = (subTotal.value + shippingFee).toFloat(),
+                                                date = LocalDate.now().toString(),
+                                                username = username,
+                                                address = address,
+                                                paid = false,
+                                                listProductID = listCartItems.value.map { it.productID },
+                                            )
+                                        )
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 10.dp)
+                                    .size(50.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(220, 170, 170)
+                                )
+                            ) {
+                                Text(
+                                    text = "$${subTotal.value + shippingFee}",
+                                    fontSize = 20.sp,
+                                    fontFamily = robotoMonoFont,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black
+                                )
+                            }
+                        }
                     }
+
+                    is InvoiceUiState.Loading -> {
+                        Column(Modifier.fillMaxWidth()) {
+                            Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
+
+                    is InvoiceUiState.Success -> {
+                        runBlocking {
+                            try {
+                                CartApi.retrofitService.deleteCart(cartViewModel.cartID)
+                                cartViewModel.clearCart()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                        onNavToPaymentSuccessScreen()
+                        invoiceViewModel.setInvoiceUiStateToIdle()
+                        Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
+                    }
+
+                    is InvoiceUiState.Error -> {
+                        invoiceViewModel.setInvoiceUiStateToIdle()
+                        Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+                    }
+
                 }
+
             }
         }
     }

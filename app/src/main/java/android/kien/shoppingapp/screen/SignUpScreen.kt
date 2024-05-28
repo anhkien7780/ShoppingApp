@@ -9,6 +9,7 @@ import android.kien.shoppingapp.viewmodel.RegisterUiState
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -92,35 +93,41 @@ fun SignUpScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
             Spacer(modifier = Modifier.padding(bottom = 30.dp))
+
             Button(colors = ButtonDefaults.buttonColors(containerColor = Color(217, 217, 217)),
                 modifier = Modifier.size(width = 150.dp, height = 50.dp),
                 onClick = {
                     accountViewModel.register(email, password)
                 }) {
-                Text(
-                    text = "Sign up",
-                    fontFamily = rignteousFont,
-                    fontWeight = FontWeight.Normal,
-                    color = Color.Black
-                )
-            }
-            when (registerUiState) {
-                is RegisterUiState.Idle -> {}
-                is RegisterUiState.Loading -> {
-                    CircularProgressIndicator()
-                }
 
-                is RegisterUiState.Success -> {
-                    Toast.makeText(context, "Resister Success", Toast.LENGTH_SHORT).show()
-                    cartViewModel.addNewCart(email)
-                    onSignUpSuccess()
-                    accountViewModel.registerUiState = RegisterUiState.Idle
-                }
+                when (registerUiState) {
+                    is RegisterUiState.Idle -> {
+                        Text(
+                            text = "Sign up",
+                            fontFamily = rignteousFont,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Black
+                        )
+                    }
+                    is RegisterUiState.Loading -> {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator()
+                        }
+                    }
 
-                is RegisterUiState.Error -> {
-                    Toast.makeText(context, "Resister Error", Toast.LENGTH_SHORT).show()
+                    is RegisterUiState.Success -> {
+                        Toast.makeText(context, "Resister Success", Toast.LENGTH_SHORT).show()
+                        cartViewModel.addNewCart(email)
+                        onSignUpSuccess()
+                        accountViewModel.registerUiState = RegisterUiState.Idle
+                    }
+
+                    is RegisterUiState.Error -> {
+                        Toast.makeText(context, "Resister Error", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
+
         }
     }
 }

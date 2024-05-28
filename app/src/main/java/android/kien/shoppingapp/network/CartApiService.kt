@@ -23,7 +23,7 @@ interface CartApiService{
         @Path("quantity") quantity: Int
     )
     @DELETE("/cart/delete/{cartID}")
-    suspend fun deleteCart(@Path("cartID") cartID: Int): Cart
+    suspend fun deleteCart(@Path("cartID") cartID: Int)
     @DELETE("/cart/delete/{cartID}/{productID}")
     suspend fun deleteCartItem(@Path("cartID") cartID: Int, @Path("productID") productID: Int)
 

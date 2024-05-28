@@ -15,15 +15,17 @@ import android.kien.shoppingapp.screen.UserInfoSettingScreen
 import android.kien.shoppingapp.viewmodel.AccountViewModel
 import android.kien.shoppingapp.viewmodel.AvatarImageViewModel
 import android.kien.shoppingapp.viewmodel.CartViewModel
+import android.kien.shoppingapp.viewmodel.InvoiceViewModel
 import android.kien.shoppingapp.viewmodel.ProductViewModel
 import android.kien.shoppingapp.viewmodel.UserUiState
 import android.kien.shoppingapp.viewmodel.UserViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,6 +43,7 @@ fun MyAppNavHost(
     avatarImageViewModel: AvatarImageViewModel = viewModel(),
     userViewModel: UserViewModel = viewModel(),
     productViewModel: ProductViewModel = viewModel(),
+    invoiceViewModel: InvoiceViewModel = viewModel(),
     startDestination: String = Screen.SignInScreen.route
 ) {
     NavHost(navController = navController, startDestination = startDestination) {
@@ -69,8 +72,8 @@ fun MyAppNavHost(
 
         composable(route = Screen.ListProductsScreen.route) {
             if (userViewModel.userUiState == UserUiState.Loading) {
-                Column(Modifier.fillMaxSize()) {
-                    CircularProgressIndicator(modifier = Modifier.fillMaxSize())
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator()
                 }
             } else {
                 ListProductScreen(
@@ -157,10 +160,14 @@ fun MyAppNavHost(
 
         composable(route = Screen.PaymentScreen.route) {
             PaymentScreen(
+                username = accountViewModel.username,
+                invoiceViewModel = invoiceViewModel,
                 cartViewModel = cartViewModel,
                 userViewModel = userViewModel,
                 productViewModel = productViewModel,
-                onBack = { navController.popBackStack() })
+                onBack = { navController.popBackStack() },
+                onNavToPaymentSuccessScreen = { navController.navigate(Screen.PaymentSuccessScreen.route) }
+            )
         }
     }
 }
