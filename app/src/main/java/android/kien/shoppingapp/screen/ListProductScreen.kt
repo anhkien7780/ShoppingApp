@@ -1,55 +1,59 @@
 package android.kien.shoppingapp.screen
 
 import android.kien.shoppingapp.R
-import android.kien.shoppingapp.library.composable.AccountDrawerSheet
+import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.library.composable.robotoMonoFont
 import android.kien.shoppingapp.models.User
 import android.kien.shoppingapp.navigation.Screen
 import android.kien.shoppingapp.viewmodel.ProductViewModel
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -101,8 +105,7 @@ fun ListProductScreen(
                     .fillMaxHeight(0.95f)
             ) {
                 IconButton(
-                    onClick = onLogout,
-                    modifier = Modifier
+                    onClick = onLogout, modifier = Modifier
                         .size(60.dp)
                         .align(Alignment.Bottom)
                 ) {
@@ -116,58 +119,58 @@ fun ListProductScreen(
         })
     }) {
         Scaffold(topBar = {
-            var searchQuery by remember { mutableStateOf("") }
-            CenterAlignedTopAppBar(navigationIcon = {
-                IconButton(onClick = {
-                    scope.launch {
-                        drawerState.apply {
-                            if (isClosed) open() else close()
-                        }
+//            var searchQuery by remember { mutableStateOf("") }
+            CenterAlignedTopAppBar(
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            scope.launch {
+                                drawerState.apply { if (isClosed) open() else close() }
+                            }
+                        }) {
+                        Icon(imageVector = Icons.Default.Menu, contentDescription = null)
                     }
-                }) {
-                    Icon(imageVector = Icons.Default.Menu, contentDescription = null)
-                }
-            }, title = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    ProvideTextStyle(
-                        value = TextStyle(
-                            fontSize = 20.sp,
-                            fontFamily = robotoMonoFont,
-                            fontWeight = FontWeight.Normal
-                        )
-                    ) {
-                        SearchBar(
-                            query = searchQuery,
-                            onQueryChange = { searchQuery = it },
-                            onSearch = {},
-                            active = false,
-                            onActiveChange = {},
-                            placeholder = { Text(text = "Search something!") },
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = {},
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Search,
-                                        contentDescription = null,
-                                    )
-                                }
-                            },
-                        ) {
-
-                        }
-                    }
-
-                }
-            }, actions = {
-                IconButton(onClick = { onNavigateToCart() }) {
-                    Icon(
-                        imageVector = Icons.Default.ShoppingCart, contentDescription = null
+                },
+                title = {
+//                    ProvideTextStyle(
+//                        value = TextStyle(
+//                            fontSize = 20.sp,
+//                            fontFamily = robotoMonoFont,
+//                            fontWeight = FontWeight.Normal
+//                        )
+//                    ) {
+//                        SearchBar(
+//                            query = searchQuery,
+//                            onQueryChange = { searchQuery = it },
+//                            onSearch = {},
+//                            active = false,
+//                            onActiveChange = {},
+//                            placeholder = { Text(text = "Search something!") },
+//                            trailingIcon = {
+//                                IconButton(
+//                                    onClick = {},
+//                                ) {
+//                                    Icon(
+//                                        imageVector = Icons.Default.Search,
+//                                        contentDescription = null,
+//                                    )
+//                                }
+//                            },
+//                        ) {}
+//                    }
+                    Text(
+                        text = "LIST PRODUCT",
+                        fontSize = 20.sp,
+                        fontFamily = rignteousFont,
+                        fontWeight = FontWeight.Normal
                     )
-                }
-            })
+                }, actions = {
+                    IconButton(onClick = { onNavigateToCart() }) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingCart, contentDescription = null
+                        )
+                    }
+                })
         }, content = { innerPadding ->
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2), modifier = Modifier.padding(innerPadding)
@@ -188,8 +191,7 @@ fun ListProductScreen(
 fun ProductCard(product: Product, onClick: () -> Unit) {
     val cardWidth = 180.dp
     val cardHeight = 330.dp
-    Card(
-        shape = RectangleShape,
+    Card(shape = RectangleShape,
         modifier = Modifier
             .padding(5.dp)
             .size(width = cardWidth, height = cardHeight)
@@ -233,16 +235,80 @@ fun ProductCard(product: Product, onClick: () -> Unit) {
     }
 }
 
+@Composable
+fun AccountDrawerSheet(
+    accountName: String,
+    sex: Boolean,
+    avatarUrl: String?,
+    onNavigateToAccountSetting: () -> Unit,
+    modifier: Modifier
+) {
+    Column(
+        modifier = Modifier
+            .size(width = 320.dp, height = 60.dp)
+            .background(color = Color(214, 214, 214)),
+    ) {
+        HorizontalDivider(thickness = 2.dp, color = Color.Black)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Column(Modifier.padding(end = 10.dp)) {
+                AsyncImage(
+                    model = avatarUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 5.dp)
+                        .size(50.dp)
+                        .clip(CircleShape)
+                        .border(0.1.dp, color = Color.Transparent),
+                )
+            }
+            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+            Column(Modifier.weight(2f)) {
+                Text(
+                    text = accountName,
+                    fontFamily = rignteousFont,
+                    fontSize = 18.sp,
+                )
+                Text(
+                    text = if (sex) "Male" else "Female",
+                    fontFamily = rignteousFont,
+                    fontSize = 15.sp,
+                )
+            }
+            IconButton(
+                onClick = onNavigateToAccountSetting,
+            ) {
+                Icon(imageVector = Icons.Default.Create, contentDescription = "Account Setting")
+            }
+        }
+        HorizontalDivider(thickness = 2.dp, color = Color.Black)
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun ProductCardPreview() {
     ProductCard(
         Product(
-            1,
-            "Product 1",
-            12f,
-            "https://picsum.photos/200/300",
-            ""
+            1, "Product 1", 12f, "https://picsum.photos/200/300", ""
         )
     ) {}
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AccountDrawerSheetPreview() {
+    AccountDrawerSheet(
+        "Test",
+        true,
+        "https://png.pngtree.com/png-clipart/20200224/original/pngtree-cartoon-color-simple-male-avatar-png-image_5230557.jpg",
+        onNavigateToAccountSetting = {},
+        modifier = Modifier
+    )
+
 }

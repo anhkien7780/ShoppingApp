@@ -1,21 +1,7 @@
 package android.kien.shoppingapp.library.composable
 
 import android.kien.shoppingapp.R
-import android.kien.shoppingapp.ui.theme.ShoppingAppTheme
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,21 +10,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 
 
 val rignteousFont = FontFamily(
@@ -171,87 +148,6 @@ fun SignUpTextButton(onNavigateToSignUp: () -> Unit) {
     }
 }
 
-
-@Composable
-fun AccountDrawerSheet(
-    accountName: String,
-    sex: Boolean,
-    avatarUrl: String?,
-    onNavigateToAccountSetting: () -> Unit,
-    modifier: Modifier
-) {
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .size(width = 320.dp, height = 60.dp)
-            .background(color = Color(214, 214, 214)),
-    ) {
-        Column (Modifier.weight(1f)){
-            AsyncImage(
-                model = avatarUrl,
-                contentDescription = null,
-                contentScale = ContentScale.FillHeight,
-                modifier = Modifier
-                    .align(Alignment.Start)
-                    .padding(start = 5.dp)
-                    .size(50.dp)
-                    .clip(CircleShape)
-                    .border(0.1.dp, color = Color.Transparent),
-            )
-        }
-        Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-        Column (Modifier.weight(2f)){
-            Text(
-                text = accountName,
-                fontFamily = rignteousFont,
-                fontSize = 18.sp,
-            )
-
-            Text(
-                text = if (sex) "Male" else "Female",
-                fontFamily = rignteousFont,
-                fontSize = 15.sp,
-            )
-
-
-        }
-        IconButton(
-            onClick = onNavigateToAccountSetting,
-        ) {
-            Icon(imageVector = Icons.Default.Create, contentDescription = "Account Setting")
-        }
-    }
-}
-
-
-// Preview
-
-
-@Preview(showBackground = true)
-@Composable
-fun SignUpInputPreview() {
-    ShoppingAppTheme {
-        SignUpInput()
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun RememberPasswordPreview() {
-    ShoppingAppTheme {
-        RememberPassword()
-    }
-}
-
-@Preview
-@Composable
-fun SignUpTextButtonPreview() {
-    ShoppingAppTheme {
-        SignUpTextButton { }
-    }
-}
 
 
 

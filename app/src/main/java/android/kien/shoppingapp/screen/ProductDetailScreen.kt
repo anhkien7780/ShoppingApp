@@ -3,6 +3,7 @@ package android.kien.shoppingapp.screen
 import android.annotation.SuppressLint
 import android.content.Context
 import android.kien.shoppingapp.R
+import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.library.composable.robotoMonoFont
 import android.kien.shoppingapp.viewmodel.CartUiState
 import android.kien.shoppingapp.viewmodel.CartViewModel
@@ -20,7 +21,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,15 +31,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -69,53 +63,60 @@ fun ProductDetailsScreen(
     val scrollableState = rememberScrollState()
     val product =
         productViewModel.productList.value!![item]
-    var searchQuery by remember {
-        mutableStateOf("")
-    }
+//    var searchQuery by remember {
+//        mutableStateOf("")
+//    }
     Scaffold(topBar = {
-        CenterAlignedTopAppBar(navigationIcon = {
-            IconButton(onClick = {
-                navController.popBackStack()
-            }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back"
+        CenterAlignedTopAppBar(
+            navigationIcon = {
+                IconButton(
+                    onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+            },
+            title = {
+//                ProvideTextStyle(
+//                    value = TextStyle(
+//                        fontSize = 20.sp,
+//                        fontFamily = robotoMonoFont,
+//                        fontWeight = FontWeight.Normal
+//                    )
+//                ) {
+//                    SearchBar(
+//                        query = searchQuery,
+//                        onQueryChange = { searchQuery = it },
+//                        onSearch = {},
+//                        active = false,
+//                        onActiveChange = {},
+//                        placeholder = { Text(text = "Search something!") },
+//                        trailingIcon = {
+//                            IconButton(onClick = {}) {
+//                                Icon(
+//                                    imageVector = Icons.Default.Search,
+//                                    contentDescription = null,
+//                                )
+//                            }
+//                        },
+//                    ) {}
+//                }
+                Text(
+                    text = "PRODUCT DETAILS",
+                    fontSize = 20.sp,
+                    fontFamily = rignteousFont,
+                    fontWeight = FontWeight.Normal
                 )
-            }
-        }, title = {
-            ProvideTextStyle(
-                value = TextStyle(
-                    fontSize = 20.sp, fontFamily = robotoMonoFont, fontWeight = FontWeight.Normal
-                )
-            ) {
-                SearchBar(
-                    query = searchQuery,
-                    onQueryChange = { searchQuery = it },
-                    onSearch = {},
-                    active = false,
-                    onActiveChange = {},
-                    placeholder = { Text(text = "Search something!") },
-                    trailingIcon = {
-                        IconButton(
-                            onClick = {},
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = null,
-                            )
-                        }
-                    },
-                ) {
+            },
+            actions = {
+                IconButton(onClick = onNavigateToCart) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart, contentDescription = "Cart"
+                    )
 
                 }
-            }
-        }, actions = {
-            IconButton(onClick = onNavigateToCart) {
-                Icon(
-                    imageVector = Icons.Default.ShoppingCart, contentDescription = "Cart"
-                )
-
-            }
-        })
+            })
     }) { innerPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
