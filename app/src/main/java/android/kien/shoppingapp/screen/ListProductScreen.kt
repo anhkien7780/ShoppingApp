@@ -5,6 +5,7 @@ import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.library.composable.robotoMonoFont
 import android.kien.shoppingapp.models.User
 import android.kien.shoppingapp.navigation.Screen
+import android.kien.shoppingapp.viewmodel.AvatarImageViewModel
 import android.kien.shoppingapp.viewmodel.ProductViewModel
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -71,12 +72,13 @@ import kotlin.system.exitProcess
 fun ListProductScreen(
     navController: NavController,
     user: User,
-    avatarUrl: String?,
+    avatarImageViewModel: AvatarImageViewModel,
     productViewModel: ProductViewModel,
     onNavigateToCart: () -> Unit,
     onLogout: () -> Unit,
     onNavigateToAccountSetting: () -> Unit
 ) {
+    val avatarUrl: String? = avatarImageViewModel.avatarImage?.url
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     var backPressedCount by remember { mutableIntStateOf(0) }
@@ -105,13 +107,17 @@ fun ListProductScreen(
                     .fillMaxHeight(0.95f)
             ) {
                 IconButton(
-                    onClick = onLogout, modifier = Modifier
+                    onClick = {
+                        avatarImageViewModel.getAvatarImage(username = user.username)
+                        onLogout()
+
+                    }, modifier = Modifier
                         .size(60.dp)
                         .align(Alignment.Bottom)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                        contentDescription = "Exit app",
+                        contentDescription = "Log out button",
                         modifier = Modifier.size(60.dp)
                     )
                 }

@@ -5,6 +5,11 @@ import android.kien.shoppingapp.R
 import android.kien.shoppingapp.library.composable.SignUpTextButton
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.library.composable.robotoMonoFont
+import android.kien.shoppingapp.models.Account
+import android.kien.shoppingapp.network.AccountApi
+import android.kien.shoppingapp.network.AvatarImageApi
+import android.kien.shoppingapp.network.CartApi
+import android.kien.shoppingapp.network.UserApi
 import android.kien.shoppingapp.viewmodel.AccountViewModel
 import android.kien.shoppingapp.viewmodel.AvatarImageViewModel
 import android.kien.shoppingapp.viewmodel.CartViewModel
@@ -30,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +48,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -58,6 +65,7 @@ fun SignInScreen(
     var password by remember { mutableStateOf("") }
     var rememberState by remember { mutableStateOf(false) }
     var wrongPassword by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -119,41 +127,66 @@ fun SignInScreen(
                 )
             }
         }
+        Spacer(modifier = Modifier.padding(top = 20.dp))
         when (loginUiState) {
-            is LoginUiState.Idle -> {}
+            is LoginUiState.Idle -> {
+                Button(
+                    onClick = {
+                        accountViewModel.login(email, password)
+                        wrongPassword = false
+                        scope.launch {
+                            try {
+                                accountViewModel.loginUiState = LoginUiState.Loading
+                                AccountApi.retrofitService.login(Account(email, password))
+                                accountViewModel.username = email
+                                val avatarImageUrl =
+                                    AvatarImageApi.retrofitService.getAvatar(username = email)
+                                avatarImageViewModel.avatarImage = avatarImageUrl
+                                userViewModel.user.value = UserApi.retrofitService.getUser(email)
+                                val cart = CartApi.retrofitService.getCart(email)
+                                cartViewModel.cartID = cart.cartID
+                                cartViewModel.listCartItems.value = cart.listCartItem
+                                accountViewModel.loginUiState = LoginUiState.Success
+                            } catch (e: Exception) {
+                                accountViewModel.loginUiState = LoginUiState.Error
+                                wrongPassword = true
+                                e.printStackTrace()
+                            }
+
+                        }
+                    },
+                    modifier = Modifier.size(width = 150.dp, height = 50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(217, 217, 217))
+                ) {
+                    Text(
+                        text = "Sign In",
+                        fontFamily = rignteousFont,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.Black
+                    )
+                }
+            }
+
             is LoginUiState.Loading -> {
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    CircularProgressIndicator()
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.size(width = 150.dp, height = 50.dp)
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
             }
 
             is LoginUiState.Success -> {
                 onSuccessfulSignIn()
-                avatarImageViewModel.getAvatarImage(accountViewModel.username)
-                userViewModel.getUser(accountViewModel.username)
-                cartViewModel.getCart(accountViewModel.username)
             }
 
             is LoginUiState.Error -> {
+                accountViewModel.loginUiState = LoginUiState.Idle
                 wrongPassword = true
             }
         }
-        Spacer(modifier = Modifier.padding(top = 20.dp))
-        Button(
-            onClick = {
-                accountViewModel.login(email, password)
-                wrongPassword = false
-            },
-            modifier = Modifier.size(width = 150.dp, height = 50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(217, 217, 217))
-        ) {
-            Text(
-                text = "Sign In",
-                fontFamily = rignteousFont,
-                fontWeight = FontWeight.Normal,
-                color = Color.Black
-            )
-        }
+
+
 
         SignUpTextButton(onNavigateToSignUp)
         Text(

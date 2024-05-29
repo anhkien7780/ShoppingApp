@@ -12,8 +12,8 @@ import kotlinx.coroutines.launch
 sealed class LoginUiState {
     object Idle: LoginUiState()
     object Loading : LoginUiState()
-    data class Success(val username: String) : LoginUiState()
-    data class Error(val exception: Exception) : LoginUiState()
+    object Success : LoginUiState()
+    object Error : LoginUiState()
 }
 sealed class LogoutUiState {
     object Idle: LogoutUiState()
@@ -31,25 +31,22 @@ sealed class RegisterUiState {
 
 class AccountViewModel : ViewModel() {
     var loginUiState: LoginUiState by mutableStateOf(LoginUiState.Idle)
-        private set
     var registerUiState: RegisterUiState by mutableStateOf(RegisterUiState.Idle)
     var username: String by mutableStateOf("")
-        private set
     fun logout(){
         username = ""
         loginUiState = LoginUiState.Idle
         registerUiState = RegisterUiState.Idle
     }
+
     private fun _login(username: String, password: String) {
         viewModelScope.launch {
             try {
                 AccountApi.retrofitService.login(Account(username, password))
                 this@AccountViewModel.username = username
-                loginUiState = LoginUiState.Success(username)
             } catch (e: Exception) {
-                loginUiState = LoginUiState.Error(e)
-            } finally {
-                LoginUiState.Idle
+                loginUiState = LoginUiState.Error
+                e.printStackTrace()
             }
         }
     }

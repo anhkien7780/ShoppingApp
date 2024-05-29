@@ -191,29 +191,40 @@ fun ChangeInfoScreen(
             ) {
                 Button(
                     onClick = {
-                        scope.launch {
-                            try {
-                                val user = User(
-                                    name = name,
-                                    birthDay = birthday.format(DateTimeFormatter.ofPattern("d/M/yyyy")),
-                                    sex = gender,
-                                    age = LocalDateTime.now().year - birthday.year,
-                                    phoneNumber = phoneNumber,
-                                    username = username
-                                )
-                                UserApi.retrofitService.updateUser(user)
-                                userViewModel.user.value = user
-                                if (uri != null) {
-                                    val imagePart = uriToMultipart(uri, context, username)
-                                    AvatarImageApi.retrofitService.changeImage(imagePart, username)
-                                    avatarImageViewModel.avatarImage!!.url = uri.toString()
+                        if (phoneNumber.length <= 10) {
+
+
+                            scope.launch {
+                                try {
+                                    val user = User(
+                                        name = name,
+                                        birthDay = birthday.format(DateTimeFormatter.ofPattern("d/M/yyyy")),
+                                        sex = gender,
+                                        age = LocalDateTime.now().year - birthday.year,
+                                        phoneNumber = phoneNumber,
+                                        username = username
+                                    )
+                                    UserApi.retrofitService.updateUser(user)
+                                    userViewModel.user.value = user
+                                    if (uri != null) {
+                                        val imagePart = uriToMultipart(uri, context, username)
+                                        AvatarImageApi.retrofitService.changeImage(
+                                            imagePart,
+                                            username
+                                        )
+                                        avatarImageViewModel.avatarImage!!.url = uri.toString()
+                                    }
+                                    Toast.makeText(context, "Update success", Toast.LENGTH_SHORT)
+                                        .show()
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    Toast.makeText(context, "Update failed", Toast.LENGTH_SHORT)
+                                        .show()
                                 }
-                                Toast.makeText(context, "Update success", Toast.LENGTH_SHORT)
-                                    .show()
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                Toast.makeText(context, "Update failed", Toast.LENGTH_SHORT).show()
                             }
+                        } else{
+                            Toast.makeText(context, "Phone number must be 10 digits or less", Toast.LENGTH_SHORT)
+                                .show()
                         }
                     },
                     modifier = Modifier
@@ -272,7 +283,7 @@ fun ChangeAvatar(placeholder: Int, onUriChange: (Uri?) -> Unit, avatarImageUrl: 
                     contentDescription = "Folder send fill"
                 )
             }
-            Text(text = "Image size < 1MB", fontFamily = rignteousFont)
+            Text(text = "Choose your avatar image", fontFamily = rignteousFont)
         }
     }
 }

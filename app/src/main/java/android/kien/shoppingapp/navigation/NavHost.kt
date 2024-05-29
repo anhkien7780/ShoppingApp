@@ -79,7 +79,7 @@ fun MyAppNavHost(
                 ListProductScreen(
                     navController = navController,
                     productViewModel = productViewModel,
-                    avatarUrl = avatarImageViewModel.avatarImage?.url,
+                    avatarImageViewModel = avatarImageViewModel,
                     user = userViewModel.user.value!!,
                     onNavigateToCart = { navController.navigate(Screen.CartScreen.route) },
                     onLogout = {

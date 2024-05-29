@@ -22,16 +22,14 @@ sealed class CartUiState {
 class CartViewModel : ViewModel() {
     var cartUiState: CartUiState by mutableStateOf(CartUiState.Idle)
     var cartID by mutableIntStateOf(-1)
-        private set
-    private var _listCartItems = MutableStateFlow(listOf<CartItem>())
-    val listCartItems: StateFlow<List<CartItem>> = _listCartItems
+    var listCartItems = MutableStateFlow(listOf<CartItem>())
     @Suppress("FunctionName")
     private fun _getCart(username: String) {
         viewModelScope.launch {
             try {
                 val cart = CartApi.retrofitService.getCart(username)
                 cartID = cart.cartID
-                _listCartItems.value = cart.listCartItem
+                listCartItems.value = cart.listCartItem
             } catch (e: Exception) {
                 e.printStackTrace()
                 println("Get cart failed")
@@ -48,7 +46,7 @@ class CartViewModel : ViewModel() {
             try {
                 val cart = CartApi.retrofitService.addNewCart(username)
                 cartID = cart.cartID
-                _listCartItems.value = emptyList()
+                listCartItems.value = emptyList()
             } catch (e: Exception) {
                 e.printStackTrace()
                 println("Add new cart failed")
@@ -64,7 +62,7 @@ class CartViewModel : ViewModel() {
             try {
                 cartUiState = CartUiState.Loading
                 var foundCartItem = false
-                val currentList = _listCartItems.value
+                val currentList = listCartItems.value
                 CartApi.retrofitService.addToCart(cartID, productID)
                 val newList = currentList.map { cartItem ->
                     if (cartItem.productID == productID) {
@@ -75,9 +73,9 @@ class CartViewModel : ViewModel() {
                     }
                 }
                 if (!foundCartItem) {
-                    _listCartItems.value = newList + CartItem(productID, 1)
+                    listCartItems.value = newList + CartItem(productID, 1)
                 } else {
-                    _listCartItems.value = newList
+                    listCartItems.value = newList
                 }
                 cartUiState = CartUiState.Success
             } catch (e: Exception) {
@@ -92,14 +90,14 @@ class CartViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 CartApi.retrofitService.updateCartItemQuantity(cartID, productID, quantity)
-                val newList = _listCartItems.value.map { cartItem ->
+                val newList = listCartItems.value.map { cartItem ->
                     if (cartItem.productID == productID) {
                         cartItem.copy(quantity = quantity)
                     } else {
                         cartItem
                     }
                 }
-                _listCartItems.value = newList
+                listCartItems.value = newList
             } catch (e: Exception) {
                 e.printStackTrace()
                 println("Update cart failed")
@@ -111,7 +109,7 @@ class CartViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 CartApi.retrofitService.deleteCartItem(cartID, productID)
-                _listCartItems.value = _listCartItems.value.filter { it.productID != productID }
+                listCartItems.value = listCartItems.value.filter { it.productID != productID }
             } catch (e: Exception) {
                 e.printStackTrace()
                 println("Delete cart failed")
@@ -119,6 +117,6 @@ class CartViewModel : ViewModel() {
         }
     }
     fun clearCart(){
-        _listCartItems.value = emptyList()
+        listCartItems.value = emptyList()
     }
 }

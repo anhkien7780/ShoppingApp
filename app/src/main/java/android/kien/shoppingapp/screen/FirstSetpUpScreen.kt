@@ -114,8 +114,20 @@ fun FirstSetupScreen(
             )
             OutlinedTextField(
                 value = phoneNumber,
-                label = { Text(text = "Phone number", fontFamily = rignteousFont, fontSize = 16.sp) },
-                placeholder = { Text(text = phoneNumber, fontFamily = rignteousFont, fontSize = 16.sp) },
+                label = {
+                    Text(
+                        text = "Phone number",
+                        fontFamily = rignteousFont,
+                        fontSize = 16.sp
+                    )
+                },
+                placeholder = {
+                    Text(
+                        text = phoneNumber,
+                        fontFamily = rignteousFont,
+                        fontSize = 16.sp
+                    )
+                },
                 onValueChange = { value -> phoneNumber = value.filter { it.isDigit() } },
                 textStyle = TextStyle(fontFamily = rignteousFont, fontSize = 20.sp),
                 shape = RectangleShape,
@@ -144,30 +156,34 @@ fun FirstSetupScreen(
             ) {
                 Button(
                     onClick = {
-                        scope.launch {
-                            try {
-                                val user = User(
-                                    name = name,
-                                    birthDay = birthDay.format(DateTimeFormatter.ofPattern("d/MM/yyyy")),
-                                    age = LocalDate.now().year - birthDay.year,
-                                    sex = sex,
-                                    phoneNumber = phoneNumber,
-                                    username = username
-                                )
-                                userViewModel.user.value = user
-                                UserApi.retrofitService.addNewUser(user)
-                                val imagePart = uriToMultipart(uri, context, username)
-                                AvatarImageApi.retrofitService.addImage(imagePart, username)
-                                avatarImageViewModel.avatarImage =
-                                    AvatarImage(uri.toString(), username)
-                                Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
-                                onAddUserInfo()
-                            } catch (e: Exception) {
-                                Toast.makeText(context, "Save failed", Toast.LENGTH_SHORT).show()
-                                e.printStackTrace()
+                        if (phoneNumber.length <= 10) {
+                            scope.launch {
+                                try {
+                                    val user = User(
+                                        name = name,
+                                        birthDay = birthDay.format(DateTimeFormatter.ofPattern("d/MM/yyyy")),
+                                        age = LocalDate.now().year - birthDay.year,
+                                        sex = sex,
+                                        phoneNumber = phoneNumber,
+                                        username = username
+                                    )
+                                    userViewModel.user.value = user
+                                    UserApi.retrofitService.addNewUser(user)
+                                    val imagePart = uriToMultipart(uri, context, username)
+                                    AvatarImageApi.retrofitService.addImage(imagePart, username)
+                                    avatarImageViewModel.avatarImage =
+                                        AvatarImage(uri.toString(), username)
+                                    Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show()
+                                    onAddUserInfo()
+                                } catch (e: Exception) {
+                                    Toast.makeText(context, "Save failed", Toast.LENGTH_SHORT)
+                                        .show()
+                                    e.printStackTrace()
+                                }
                             }
+                        } else{
+                            Toast.makeText(context, "Phone number must be 10 digits or less", Toast.LENGTH_SHORT).show()
                         }
-
                     },
                     modifier = Modifier
                         .align(Alignment.Bottom)
@@ -200,15 +216,22 @@ fun uriToMultipart(uri: Uri?, context: Context, username: String): MultipartBody
     val inputStream: InputStream? = uri?.let { it ->
         contentResolver.openInputStream(it)
     }
-    val byteArrayOutputStream = ByteArrayOutputStream()
-    inputStream?.copyTo(byteArrayOutputStream)
-    val byteArray = byteArrayOutputStream.toByteArray()
-    val imageMediaType = "image/png".toMediaType()
-    val imageRequestBody = byteArray.toRequestBody(imageMediaType)
-    val imagePart = MultipartBody.Part.createFormData(
-        "image",
-        "${username}_avatar.png",
-        imageRequestBody
-    )
-    return imagePart
+    try {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        inputStream?.copyTo(byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+        val imageMediaType = "image/png".toMediaType()
+        val imageRequestBody = byteArray.toRequestBody(imageMediaType)
+        val imagePart = MultipartBody.Part.createFormData(
+            "image",
+            "${username}_avatar.png",
+            imageRequestBody
+        )
+        return imagePart
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return MultipartBody.Part.createFormData("null_image", "")
+    } finally {
+        inputStream?.close()
+    }
 }

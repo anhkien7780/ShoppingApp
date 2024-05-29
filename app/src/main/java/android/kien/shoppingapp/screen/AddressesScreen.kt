@@ -1,7 +1,6 @@
 package android.kien.shoppingapp.screen
 
 import android.annotation.SuppressLint
-import android.kien.shoppingapp.data.UserInfo
 import android.kien.shoppingapp.library.composable.rignteousFont
 import android.kien.shoppingapp.ui.theme.ShoppingAppTheme
 import androidx.compose.foundation.layout.Column
@@ -62,6 +61,6 @@ fun AddressItemPreview() {
 @Composable
 fun AddressesScreenPreview() {
     ShoppingAppTheme {
-        AddressesScreen({})
+        AddressesScreen {}
     }
 }

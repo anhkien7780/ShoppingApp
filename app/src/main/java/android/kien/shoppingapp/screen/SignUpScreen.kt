@@ -97,7 +97,10 @@ fun SignUpScreen(
             Button(colors = ButtonDefaults.buttonColors(containerColor = Color(217, 217, 217)),
                 modifier = Modifier.size(width = 150.dp, height = 50.dp),
                 onClick = {
-                    accountViewModel.register(email, password)
+                    if(password == confirmPassword)
+                        accountViewModel.register(email, password)
+                    else
+                        Toast.makeText(context, "Password not match", Toast.LENGTH_SHORT).show()
                 }) {
 
                 when (registerUiState) {
@@ -124,6 +127,7 @@ fun SignUpScreen(
 
                     is RegisterUiState.Error -> {
                         Toast.makeText(context, "Resister Error", Toast.LENGTH_SHORT).show()
+                        accountViewModel.registerUiState = RegisterUiState.Idle
                     }
                 }
             }
@@ -147,7 +151,7 @@ fun ShowLogo(
         )
         Spacer(modifier = Modifier.size(30.dp))
         Text(
-            text = "Shopping App",
+            text = "Cafe Shop App",
             fontSize = 30.sp,
             fontFamily = rignteousFont,
             fontWeight = FontWeight.Normal

@@ -31,4 +31,7 @@ class AvatarImageViewModel : ViewModel() {
             }
         }
     }
+    fun setAvatarImageToNull(){
+        avatarImage = null
+    }
 }
